@@ -1,0 +1,19 @@
+<script type="text/javascript">
+
+function print(){
+
+	var myWindow = window.open("", "MsgWindow", "width=800,height=600");
+	myWindow.document.write("<html>");
+	myWindow.document.write("<link rel=stylesheet href=/styles/bootstrap.min.css>");
+	myWindow.document.write("<style>.form-inline{margin-top: 30px;}.form-inline p{margin-left: 15px;margin-top: 10px;}.form-inline input{margin-left: 15px}#print{margin-left: 30px;margin-top: 50px;outline: 2px solid black;width: 600px;}#print #head img{margin-top: 10px;}.hidden{display: none;visibility: hidden;}</style>");
+	myWindow.document.write("<body>");
+	myWindow.document.write("<style>@page{margin: 0; size: landscape;}</style>");
+	myWindow.document.write("<div id=print>");
+	myWindow.document.write(document.getElementById("print").innerHTML); 
+	myWindow.document.write("</div>");
+	myWindow.document.write("</body>");
+	myWindow.document.write("</html>");
+}
+
+
+</script>

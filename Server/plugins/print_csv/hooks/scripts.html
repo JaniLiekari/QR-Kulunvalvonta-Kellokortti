@@ -1,0 +1,158 @@
+
+<script type="text/javascript">
+
+
+	function CalculateCSVletter(i){
+		var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+		var result = "";
+		var index = Math.floor(i / letters.length);
+		console.log(index);
+		if(index <= 0){
+			result += letters[i];
+		}else{
+			result += letters[index];
+			result += letters[i - (index * letters.length)];
+		}
+		return result;
+	}
+
+
+	function SaveCSV(version){
+
+		var CSV = [];
+		let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";
+
+
+		var tbody = document.getElementsByTagName("tbody")[0];
+		var thead = document.getElementsByTagName("thead")[0];
+
+		var thead_th = thead.getElementsByTagName("th");
+		var tr = tbody.getElementsByTagName("tr");
+		var indexY = 1;
+		var temp = [];
+
+
+		temp.push("");
+		temp.push("");
+		console.log(thead_th.length);
+	
+
+		for(var i = 1; i < thead_th.length; i++){
+			if(thead_th[i].getElementsByTagName("p")[0]){
+				temp.push(thead_th[i].getElementsByTagName("p")[0].innerHTML);
+				temp.push("");
+				temp.push("");
+			}
+		}
+		CSV.push(temp);
+		indexY += 1;
+		temp = [];
+		temp.push("");
+		temp.push("");
+		for(var i = 1; i < thead_th.length; i++){
+			if(thead_th[i].getElementsByTagName("p")[0]){
+				temp.push(thead_th[i].getElementsByTagName("p")[1].innerHTML);
+
+				temp.push("");
+				temp.push("");
+			}
+		}
+
+		CSV.push(temp);
+		indexY += 1;
+		for(var i = 0; i < tr.length; i++){
+			var indexX = 2;
+			CSV.push([]);
+			indexY += 1;
+			CSV.push([]);
+			indexY += 1;
+			temp = [];
+			var temp2 = [];
+			var temp3 = [];
+			console.log(tr[i]);
+			temp.push(tr[i].getElementsByTagName("td")[0].getElementsByTagName("a")[0].getElementsByTagName("b")[0].innerHTML);
+			temp.push("");
+			temp2.push("");
+			temp2.push("");
+			temp3.push("");
+			temp3.push("");
+			var td = tr[i].getElementsByTagName("td");
+			for(var t = 1; t < td.length; t++){
+
+				var div = td[t].getElementsByTagName("div")[2].getElementsByTagName("div")[0];
+				console.log("Vapaa: " +td[t].getElementsByTagName("div")[2].getElementsByTagName('p')[0].innerHTML);
+				var vapaa = td[t].getElementsByTagName("div")[2].getElementsByTagName('p')[0].innerHTML == "Vapaa" ? true : false;
+				var s1 = div.getElementsByTagName("p")[0].innerHTML.split(":");
+				var s2 = div.getElementsByTagName("p")[1].innerHTML.split(":");
+				var string1 = "Puuttuu";
+				var string2 = "Puuttuu";
+				console.log('s1: ' + s1.length + "|| s2: "+ s2.length);
+				if(s1.length == 3){
+					string1 = div.getElementsByTagName("p")[0].innerHTML.split(":")[1] + ":" + div.getElementsByTagName("p")[0].innerHTML.split(":")[2];
+				}
+				if(s2.length == 3){
+					string2 = div.getElementsByTagName("p")[1].innerHTML.split(":")[1] + ":" + div.getElementsByTagName("p")[1].innerHTML.split(":")[2];
+				}
+				if(!vapaa){
+				temp.push("Sisään:");
+					temp2.push("Ulos:");
+					temp3.push("Erotus:");
+					indexX+=1;
+
+					if(s1.length != 3 || s2.length != 3){
+						temp3.push("NaN");
+					}else{
+						var letter = CalculateCSVletter(indexX);
+						temp3.push("=("+letter+(indexY+1)+"<"+letter+indexY+")+"+letter+(indexY+1)+"-"+letter+indexY);
+					}
+
+					temp.push(string1.replace(/\s/g,''));
+					temp2.push(string2.replace(/\s/g,''));
+				}else{
+					temp.push('Vapaa');
+					temp2.push("");
+					temp3.push("");
+					temp.push("");
+					temp2.push("");
+					temp3.push("");
+				}
+				indexX += 1;
+				temp.push("");
+				temp2.push("");
+				temp3.push("");
+				indexX += 1;
+
+			}
+			CSV.push(temp);
+			indexY += 1;
+			CSV.push(temp2);
+			indexY += 1;
+			CSV.push(temp3);
+			indexY += 1;
+		}
+
+		CSV.forEach(function(rowArray){
+			var rowMark = version == "xxxx" ? ';' : ','; 
+	   		let row = rowArray.join(rowMark);
+	   		csvContent += row + "\r\n";
+		}); 
+
+		var encodedUri = csvContent;
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		var start = thead_th[1].getElementsByTagName('p')[1].innerHTML;
+		var end = thead.getElementsByTagName('th')[thead.getElementsByTagName('th').length - 1].getElementsByTagName('p')[1].innerHTML;
+		var url = new URL(window.location.href);
+		var c = url.searchParams.get("shift");
+		if(c == null || c == undefined || c == ""){
+			c = "ALL";
+		}
+
+		link.setAttribute("download", start+"-"+end+"_"+c.toUpperCase()+".csv");
+		document.body.appendChild(link); 
+
+		link.click();
+	}
+
+
+</script>

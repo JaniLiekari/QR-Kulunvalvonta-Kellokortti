@@ -1,0 +1,62 @@
+<style>
+
+	@-webkit-keyframes AnimationName {
+	    0%{background-position:10% 0%}
+	    50%{background-position:91% 100%}
+	    100%{background-position:10% 0%}
+	}
+	@-moz-keyframes AnimationName {
+	    0%{background-position:10% 0%}
+	    50%{background-position:91% 100%}
+	    100%{background-position:10% 0%}
+	}
+	@keyframes AnimationName {
+	    0%{background-position:10% 0%}
+	    50%{background-position:91% 100%}
+	    100%{background-position:10% 0%}
+	}
+
+	body{
+		background: linear-gradient(145deg, #000000, #282828);
+		padding: 0 0;
+		margin: 0 0;
+		height: 100%; width: 100%;
+		-webkit-animation: AnimationName 20s ease infinite;
+		-moz-animation: AnimationName 20s ease infinite;
+		animation: AnimationName 20s ease infinite;
+	}
+	.center{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		color: white;
+	}
+	.bottom{
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		transform: translate(-50%, -100%);
+		text-align: center;
+		color: white;
+	}
+
+
+</style>
+<head>
+	<title>-404- Page not found</title>
+</head>
+<body>
+	<!-- Left cry face -->
+	<img src="img/cry.png" style="width: 120px; height: 120px; position: absolute; top: 50%; left: 35%; transform: translate(-50%, -50%);">
+	<!-- Right cry face -->
+	<img src="img/cry.png" style="width: 120px; height: 120px; position: absolute; top: 50%; left: 65%; transform: translate(-50%, -50%);">
+	<div class="center">
+		<h1><b>Page not found</b></h1>
+		<p style="font-size: 20px;"><b>Redirect to admin page: </b><a href="/admin" style="color: white">Click here!</a></p>
+	</div>
+	<div class="bottom">
+		<p style="font-size: 15px;"><b>SykeIT</b></p>
+	</div>
+</body>

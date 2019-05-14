@@ -1,0 +1,34 @@
+<script type="text/javascript">
+	
+
+var actionButton = document.getElementById('btn-submit');
+var changeAction = document.getElementById('btn-changeAction')
+var form = document.getElementById('form');
+
+actionButton.value = "Kirjaudu";
+form.action = "/admin/login";
+
+<% if(reg === true){ %>
+	changeAction.onclick = function(){ ChangeActionEvent() };
+	changeAction.innerHTML = "Rekisteröidy";
+<% } else { %>
+
+	changeAction.classList.toggle('hidden');
+
+<% } %>
+
+function ChangeActionEvent(){
+
+	if(actionButton.value === "Kirjaudu"){
+		actionButton.value = "Rekisteröidy";
+		changeAction.innerHTML = "Kirjaudu";
+		form.action = "/admin/register";
+	}else{
+		actionButton.value = "Kirjaudu";
+		changeAction.innerHTML = "Rekisteröidy";
+		form.action = "/admin/login";
+	}
+
+}
+
+</script>

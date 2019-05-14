@@ -1,0 +1,120 @@
+
+<style type="text/css">
+	
+	.hideFromScreen{
+		display: none;
+		visibility: hidden;
+	}
+
+
+	.popUpMessage{
+		z-index: 100;
+		position: relative; 
+		bottom: 10px; top: 10px; left: 50%; transform: translate(-50%,0);
+		height: 40px;
+		border: solid 1px black;
+		padding-right: 10px;
+	}
+
+	.upMessageSocket{
+		position: absolute;
+		z-index: 100;
+		top: 0;
+		left: 50%;
+		height: 60px;
+		width: 700px;
+		transform: translate(-50%, 0);
+		background-color: rgba(140, 28, 14, 0.9);
+		border: solid 1px black;
+		text-align: center;
+	}
+
+</style>
+
+
+
+<div id="socket-reader-connection" class="upMessageSocket hideFromScreen">
+	<p style="position: relative; float: left; left: 50%; top: 50%; color: white; font-weight: 700; font-size: 20px; transform: translate(-50%, -50%); margin: 0 0 0 0;">QR-KOODI LUKIJA EI YHTEYDESSÄ!</p>
+	<div style="position: relative; float: right; height: 25px; width: 25px; background-color: white; border-radius: 5px; top: 50%; transform: translate(0,-50%); margin-right: 10px;" onclick="CloseSocketReaderMessage();">
+		<p style="position: relative; left: 50%; top: 50%; color: black; transform: translate(-50%, -50%); text-align: center; font-weight: 700; font-size: 15px;">X</p>
+	</div>
+</div>
+
+
+<div id="socket-message-div" class="popUpMessage hideFromScreen" style="background-color: rgba(140, 28, 14, 0.9);">
+	
+
+	<img style="float: left; margin-left: 10px; width: 20px; height: 20px; position: relative; top: 50%; transform: translate(0,-50%);" width="20" height="20" src="http://<%=IP%>:<%=PORT%>/file/img/err.png">
+	<p style="top: 50%; float: left; margin-left: 10px; position: relative; margin-bottom: 0; transform: translate(0, -50%); color: white; text-shadow: 1px 0 4px black; font-weight: 700; font-size: 15px;"></p>
+	<div style="position: relative; float: right; height: 15px; width: 15px; background-color: white; border-radius: 5px; top: 50%; transform: translate(0,-50%); margin-left: 10px;">
+		<p style="position: relative; left: 50%; top: 50%; color: black; transform: translate(-50%, -50%); text-align: center; font-weight: 700; font-size: 12px;">X</p>
+	</div>
+
+</div>
+
+
+<div id="socket-error-holder" style="position: fixed; bottom: 5px; display: table-cell;
+  vertical-align: bottom;">
+	
+
+
+
+
+</div>
+
+
+<script>
+
+	var socketReaderMessage = document.getElementById('socket-reader-connection');
+
+	function CloseSocketReaderMessage(){
+		socketReaderMessage.classList.toggle('hideFromScreen', true);
+	}
+
+	var exampleSocket = new WebSocket("ws://<%=IP%>:3330", "echo-protocol");
+	//var socketMessage = document.getElementById('socket-message');
+	var socketMessageDiv = document.getElementById('socket-message-div');
+	var errHold = document.getElementById('socket-error-holder');
+	var key = "<%= wsSecret %>";
+	exampleSocket.onopen = function (event) {
+  		exampleSocket.send("<%=user%>,<%=wsSecret%>,Client"); 
+	};
+
+	exampleSocket.onmessage = function(event) {
+		var message = event.data.split(':');
+
+		console.log(message);
+
+		if(message[0] == '01' || message[0] == '02'){
+			var clone = socketMessageDiv.cloneNode(true);
+		    clone.getElementsByTagName('div')[0].onclick = function(){
+		    	HideMyErr(clone)
+		    };
+		}
+
+
+
+		if(message[0] == '01'){ //VIALLINEN QR
+			clone.getElementsByTagName('p')[0].innerHTML = "VIALLINEN QR : " + message[1];
+		}else if(message[0] == '02'){ //EI TYÖPÄIVÄÄ
+			clone.getElementsByTagName('p')[0].innerHTML = "EI TYÖPÄIVÄÄ : " + message[1];
+		}else if(message[0] == '03'){
+			socketReaderMessage.classList.toggle('hideFromScreen', false);
+		}else if(message[0] == '04'){
+			socketReaderMessage.classList.toggle('hideFromScreen', true);
+		}
+
+		if(message[0] == '01' || message[0] == '02'){
+			clone.classList.toggle('hideFromScreen', false);
+			errHold.appendChild(clone);
+		}
+
+
+	}
+
+
+	function HideMyErr(child){
+		errHold.removeChild(child);
+	}
+
+</script>

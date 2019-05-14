@@ -1,0 +1,750 @@
+<style type="text/css">
+	
+
+	button{
+		color: white;
+		background-color: #32363d;
+		transition: 0.3s ease-in-out;
+	}
+	button:hover{
+		color: #39db59;
+		background-color: #6f7682;
+	}
+
+	.form-div{
+
+		width: 500px;
+		background-color: white;
+		border-radius: 10px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.form-settings{
+		width: 600px;
+		height: 400px;
+		background-color: white;
+		border-radius: 10px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.hidden{
+		visibility: hidden;
+		display: none;
+	}
+	.shiftButton{
+		background-color: white;
+		border-radius: 10px;
+		width: 200px;
+		height: 40px;
+		color: #3f3f3f;
+		transition-duration: 250ms;
+		cursor: pointer;
+		box-shadow: 0 0 0 black;
+	}
+	.shiftButton:hover{
+		background-color: #faffaf; 
+		border-radius: 20px;
+		box-shadow: 0 0 5px black;
+	}
+	#button_thing{
+		margin-left: 10px; 
+		margin-right: 10px; 
+		background-color: white; 
+		border-radius: 10px; 
+		width: 200px; 
+		height: 40px; 
+		color: #3f3f3f;  
+		display: inline-block; 
+		text-align: center;
+		transition-duration: 250ms;
+		cursor: pointer;
+	}
+	#button_thing:hover{
+		
+		background-color: #faffaf; 
+		border-radius: 20px;
+	}
+	.remove_button{
+		position: absolute;
+		width: 20px;
+		height: 20px;
+		left: 180px;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		background-color: red;
+		border-radius: 5px;
+		text-align: center;
+		cursor: pointer;
+		transition-delay: 60ms;
+	}
+	.remove_button:hover{
+		width: 25px;
+		height: 25px;
+
+	}
+
+
+	.triangle-down {
+		width: 0;
+		height: 0;
+		border-left: 15px solid transparent;
+		border-right: 15px solid transparent;
+		border-top: 15px solid #555;
+		transition-duration: 50ms;
+	}
+	.triangle-up {
+		width: 0;
+		height: 0;
+		border-left: 15px solid transparent;
+		border-right: 15px solid transparent;
+		border-bottom: 15px solid #555;
+		transition-duration: 50ms;
+	}
+	.triangle-down:hover {
+		border-top: 15px solid black;
+		cursor: zoom-out;
+	}
+	.triangle-up:hover {
+		border-bottom: 15px solid black;
+		cursor: zoom-in;
+	}
+
+	.radio-inline{
+		margin-right: 20px;
+		font-weight: 700;
+
+	}
+	.radio-inline input{
+		margin-right: 5px;
+	}
+
+
+</style>
+
+<!-- SALLI REKISTERÖINTI -->
+
+<div style="position: relative; width: 100%; min-height: 100%; left: 50%; top: 0px; transform: translate(-50%, 0);">
+
+	<div style="width: 100%; background-color: #c4c4c4; padding-top: 10px; margin-top: 30px; padding-bottom: 10px; padding-left: 10px; color: white; border: 1px solid #727272; text-align: center;">
+		<div style="position: relative;">
+			<p style="font-size: 27px; display: inline-block;"><b>Rekisteröinti</b></p>
+			<div class="triangle-down" onclick="showHide('hid_allowRegister', this);" style="display: inline-block; margin-left: 10px;"></div>
+		</div>
+		<div id="hid_allowRegister" class="hidden checkbox" style="font-size: 25px;" class=>
+			<label>
+			    <input id="checkBox" type="checkbox" onchange="sendData();" <% if(reg === true) { %> Checked <% } %> />
+			   	<b>Salli rekisteröinti</b>
+			</label>
+		</div>	
+	</div>
+
+	<!-- HALLINNOIN VUOROJA -->
+
+	<div style="width: 100%; background-color: #c4c4c4; padding-top: 10px;margin-top: 10px; padding-bottom: 10px; padding-left: 10px; color: white; border: 1px solid #727272;">
+
+		<div style="position: relative; text-align: center">
+			<p style="font-size: 27px; display: inline-block;"><b>Vuorot</b></p>
+			<div class="triangle-down" onclick="showHide('vuorot', this);" style="display: inline-block; margin-left: 10px;"></div>
+		</div>
+
+		<div id="vuorot" class="hidden" style="padding-left: 20px; padding-right: 20px;">
+
+			<% if(shifts) { %>
+				<% for(var i = 0; i < shifts.length; i++){ %>
+					<tag id="<%= shifts[i][0] + i %>-meta" data-name="<%= shifts[i][0] %>" data-hours="<%=shifts[i][1]%>" data-minutes="<%=shifts[i][2]%>"></tag>
+					<div id='<%= shifts[i][0] + i %>' draggable="true" class="drag-me" style="margin-top: 5px; display: inline-block; margin-left: 10px; margin-right: 10px; text-align: center; cursor: default; position: relative;">
+						<div class="shiftButton" onclick="CreateNewShift(document.getElementById('button_thing'),'<%= shifts[i][0] %>', '<%=shifts[i][0] + i %>', '<%=shifts[i][1]%>','<%=shifts[i][2]%>')">
+							<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);  white-space: nowrap; font-weight: 700"><%= shifts[i][0] %></p>
+						</div>
+					</div>	
+				<%}%>
+			<%}%>
+
+			<div id="button_thing" onclick="CreateNewShift(this);">
+				<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>Uusi vuoro++</b></p>
+			</div>
+
+		</div>
+
+	</div>
+
+
+	<!-- ETUSIVUN NÄYTTÖ ASETUKSET -->
+
+	<div style="width: 100%; background-color: #c4c4c4; padding-top: 10px;margin-top: 10px; padding-bottom: 10px; padding-left: 10px; color: white; border: 1px solid #727272;">
+
+		<div style="position: relative; text-align: center">
+			<p style="font-size: 27px; display: inline-block;"><b>Etusivun asetukset</b></p>
+			<div class="triangle-down" onclick="showHide('etusivu', this);" style="display: inline-block; margin-left: 10px;"></div>
+		</div>
+
+		<div id="etusivu" class="hidden" style="padding-left: 20px; padding-right: 20px;">
+
+			<p style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Nimen näyttäminen: </p>
+
+			<label class="radio-inline"><input type="radio" name="optradio" onchange="ChangeFirstPageOptions('Mikko M.')" <% if(MainPageSetting == 'Mikko M.'){ %> checked <% } %>>Mikko M.</label>
+			<label class="radio-inline"><input type="radio" name="optradio" onchange="ChangeFirstPageOptions('Mallikas M.')" <% if(MainPageSetting == 'Mallikas M.'){ %> checked <% } %>>Mallikas M.</label>
+			<label class="radio-inline"><input type="radio" name="optradio" onchange="ChangeFirstPageOptions('Mikko Mallikas')" <% if(MainPageSetting == 'Mikko Mallikas'){ %> checked <% } %>>Mikko Mallikas</label>
+
+		</div>
+
+	</div>
+
+
+
+	<!-- KÄYTTÄJIEN HALLINTA -->
+
+	<div id="ACCOUNT_MANAGEMENT" style="width: 100%; background-color: #c4c4c4; margin-top: 10px; padding-top: 10px; padding-bottom: 30px; border: 1px solid #727272;">
+		<div style="position: relative; text-align: center">
+			<p style="font-size: 27px; display: inline-block; color: white;"><b>Käyttäjien Hallinta</b></p>
+			<div class="triangle-down" onclick="showHide('hid_accountManagement', this);" style="display: inline-block; margin-left: 10px;"></div>
+		</div>
+		<div class="hidden" id="hid_accountManagement">
+
+			<div>
+				<div id="account-select" style="position: relative; width: 80%; left: 50%; transform: translate(-50%, 0); padding-top: 10px; margin-bottom: 10px;">
+					<% if(accounts) { %>
+
+						<% for(var i = 0; i < accounts.length; i++){ %>
+
+							<div class="account block" style="margin-top: 3px; position: relative; padding-top: 5px; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.2); color: black; padding-left: 15px; background-color: #ffffff;" onclick="">
+								<div class="row">
+									<div class="col-sm">
+										<p style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);font-size: 23px;"><b>Käyttäjä: <%= accounts[i] %></b></p>
+									</div>
+									<div class="col-sm">
+										<p>Viimeksi kirjautunut: 22.11.2018</p>
+										<p style="margin-top: 2px;">Tila: Aktivoitu</p>
+									</div>
+									<div class="col-sm" style="">
+										<%if(privileges[5] === true) {%><div style="position: absolute; right: 195px; top: 50%; text-align: center; color:white; transform: translate(-50%, -50%); width: 90px; height: 70px; border-radius: 5px; background-color: #2289f7" onclick="Edit_account('<%= accounts[i] %>');">
+											<img src="././img/settings.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 23px; transform: translate(-50%, -50%);">
+											<p style="position: absolute; left: 50%; bottom: 5px; transform: translate(-50%, 50%);">Asetukset</p>
+										</div><% } %>
+										<div style="position: absolute; right: 100px; text-align: center; color:white; top: 50%; transform: translate(-50%, -50%); width: 90px; height: 70px; border-radius: 5px; background-color: #39db59" onclick="loadLog('<%= accounts[i] %>');" >
+											<img src="././img/log.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 23px; transform: translate(-50%, -50%);">
+											<p style="position: absolute; left: 50%; bottom: 5px; transform: translate(-50%, 50%);">Loki</p>
+										</div>
+										<%if(privileges[6] === true) {%><div style="position: absolute; right: 5px; top: 50%; text-align: center; color:white; transform: translate(-50%, -50%); width: 90px; height: 70px; border-radius: 5px; background-color: #ce2727" onclick="removeAccount('<%= accounts[i] %>', this);" >
+											<img src="././img/trash.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 23px; transform: translate(-50%, -50%);">
+											<p style="position: absolute; left: 50%; bottom: 5px; transform: translate(-50%, 50%);">Poista</p>
+										</div><% } %>
+									</div>
+								</div>
+							</div>
+
+						<% } %>
+
+					<% } %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- HIDDEN -->
+
+<div id="blocker" class="hidden" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+	<div id="form-div" class="form-div" style="text-align: center; padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
+		<p id="block-head" style="margin-top: 20px; font-size: 20px;"><b>LUO UUSI VUORO</b></p>
+		<div id="form" style="text-align: left;">
+			<input type="text" class="form-control col-12" id="wewantthis" style="margin-top: 20px;" placeholder= "Vuoron nimi..." value="">
+			<label >
+				Tavoite aika: 
+				<input type="time" id="rqTime" style="margin-top: 20px;">
+			</label>
+			<input id="btn-submit" type="button" style="margin-top: 10px; background-color: white; border-color: #1d9134; color: black; font-weight: 700;" class="btn btn-primary col-12" value="Tallenna" onclick="SendNewShift();">
+			<input id="btn-remove" type="button" style="margin-top: 10px; background-color: white; border-color: #1d9134; color: black; font-weight: 700;" class="btn btn-primary col-12 hidden" value="Poista" onclick="RemoveShift()">
+		</div>
+		<div style="display: block; position: absolute; right: 0; top: 25px; width: 20px; height: 20px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: red; color: white;" onclick="hide();">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>X</b></p>
+		</div>
+	</div>
+</div>
+
+<div id='copy' class="hidden" style="margin-top: 10px; display: inline-block; margin-left: 10px; margin-right: 10px; text-align: center; position: relative;">
+	<div class="shiftButton" style="">
+		<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);  white-space: nowrap;"><b></b></p>
+	</div>
+</div>
+
+<div id="settings-block" class="hidden" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+	<div id="form-settings" class="form-settings" style="text-align: center; padding-left: 20px; padding-right: 20px;">
+		<p style="margin-top: 20px; font-size: 20px; font-weight: 700;"></p>
+		<div style="text-align: left;">
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kirjautumistietojen muokkaus</b>
+				</label>
+			</div>
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli uuden kävijän luominen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kävijän poistaminen järjestelmästä</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kävijän tietojen muokkaaminen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli vuorojen muokkaaminen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli hallitsijoiden muokkaaminen/luominen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli hallitsijoiden poistaminen</b>
+				</label>
+			</div>
+			<div style="font-size: 15px;">
+				<label>
+				   	<b>Uusi salasana</b>
+				   	 <input id="newpassword" type="text"/>
+				   	 <button id="passwordChange" class="btn btn-primary" onclick="changePassword();">Korvaa vanha salasana</button>
+				</label>
+			</div>
+		</div>
+		<div style="display: block; position: absolute; right: 0; top: 25px; width: 20px; height: 20px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: red; color: white;" onclick="closeEdit_account();">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>X</b></p>
+		</div>
+		<div id="save_account_settings" style="display: block; position: absolute; left: 50%; bottom: 0; width: 120px; height: 40px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: green; color: white;">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>Tallenna</b></p>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+function ChangeFirstPageOptions(name){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/firstpagename';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert('Asetus vaihdettu muotoon: '+name);
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+
+var dragobject = null;
+
+function dragstart(e){
+	dragobject = this;
+}
+
+function dragover(e) {
+  e.preventDefault()
+}
+function dragenter(e) {
+  e.preventDefault()
+}
+function drop() {
+	if(dragobject != null){
+		if(this == dragobject){
+			return;
+		}
+		var dragobjs = document.getElementsByClassName('drag-me');
+
+		var x = 0;
+		var y = 0;
+
+		for(var i = 0; i < dragobjs.length; i++){
+			if(dragobjs[i] == dragobject){
+				x = i;
+			}
+		}
+		for(var i= 0; i < dragobjs.length; i++){
+			if(dragobjs[i] == this){
+				y = i;
+			}
+		}
+
+		var clone = dragobject.cloneNode(true);
+		var parent = dragobject.parentNode;
+		parent.removeChild(dragobject);
+
+		if(x > y){
+			parent.insertBefore(clone,this);
+		}else{
+			if(y >= (dragobjs.length-1)){
+				parent.insertBefore(clone, document.getElementById('button_thing'));
+			}else{
+				parent.insertBefore(clone, dragobjs[y + 1]);
+			}
+		}
+
+		clone.addEventListener("dragstart", dragstart)
+		clone.addEventListener("dragover", dragover)
+		clone.addEventListener("dragenter", dragenter)
+		clone.addEventListener("drop", drop)
+
+		changeOrderOf();
+
+	}
+}
+
+
+function changeOrderOf(){
+	var objs = document.getElementsByClassName('drag-me');
+	var data = [];
+	for(var i= 0; i < objs.length; i++){
+		var temp = [];
+		var meta = document.getElementById(objs[i].id + "-meta");
+		temp.push(meta.dataset.name);
+		temp.push(meta.dataset.hours);
+		temp.push(meta.dataset.minutes);
+
+		data.push(temp);
+	}
+
+	data = JSON.stringify(data);
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/order';
+	var params="order="+data;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		console.log("ok");
+	    	}
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function createDrag(){
+	var dragElements = document.getElementsByClassName("drag-me");
+	for(var i = 0; i < dragElements.length; i++){
+		dragElements[i].addEventListener("dragstart", dragstart)
+		dragElements[i].addEventListener("dragover", dragover)
+		dragElements[i].addEventListener("dragenter", dragenter)
+		dragElements[i].addEventListener("drop", drop)
+	}
+}
+
+createDrag();
+
+function removeAccount(name, object){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/remove';
+	var params="account="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		var del = object.parentNode.parentNode.parentNode;
+	    		del.parentNode.removeChild(del);
+
+	    		if(request.responseText == 'logout'){
+	    			window.location.href = 'http://<%=IP%>:<%=PORT%>/admin';
+	    		}
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+function showHide(id, triangle){
+	var ele = document.getElementById(id);
+
+	if(ele.classList.contains('hidden')){
+		ele.classList.toggle('hidden', false);
+		triangle.classList.toggle('triangle-down', true);
+		triangle.classList.toggle('triangle-up', false);
+	}else{
+		ele.classList.toggle('hidden', true);
+		triangle.classList.toggle('triangle-down', false);
+		triangle.classList.toggle('triangle-up', true);
+	}
+}
+
+function changePassword(name){
+
+	var newpassword = document.getElementById('newpassword').value;
+	if(newpassword == null ||newpassword == undefined || newpassword.left < 1){
+		alert('Tarkista uusi salasana');
+		return;
+	}
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/edit_password';
+	var params="username="+name+"&password="+newpassword;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert('password changed to '+ newpassword);
+	    		document.getElementById('newpassword').value = "";
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+function hide(){
+	document.getElementById("blocker").classList.toggle("hidden", true);
+}
+function closeEdit_account(){
+	var settings_block = document.getElementById('settings-block');
+	settings_block.classList.toggle('hidden', true);
+}
+
+function saveEdit_account(name){
+	var settings_block = document.getElementById('settings-block');
+	settings_block.classList.toggle('hidden', true);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/edit';
+	var privileges = [];
+	var inputs = document.getElementById('form-settings').getElementsByTagName('input');
+	for(var i = 0; i < inputs.length; i++){
+		privileges.push(inputs[i].checked);
+	}
+	console.log(privileges);
+	var params="name="+name+"&privileges="+JSON.stringify(privileges);
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert(request.responseText);
+	    	}
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function Edit_account(name){
+
+	console.log('name: ' + name);
+	document.getElementById('passwordChange').onclick = function() {changePassword(name)};
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/privileges';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		var response = JSON.parse(request.responseText);
+	    		var settings_block = document.getElementById('settings-block');
+				document.getElementById('form-settings').getElementsByTagName('p')[0].innerHTML = 'Muokkaa '+name + ' käyttäjää';
+				var inputs = document.getElementById('form-settings').getElementsByTagName('input');
+
+				for(var i = 0; i < inputs.length; i++){
+					inputs[i].checked = (response[i] == 'true' || response[i] == true) ? true : false;
+				}
+
+				var save_btn = document.getElementById('save_account_settings');
+				save_btn.onclick = function(){saveEdit_account(name);};
+				settings_block.classList.toggle('hidden', false);
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+function sendData(){
+
+	var checkBox = document.getElementById("checkBox").checked == true ? true : false;
+	console.log(checkBox);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/register';
+	var params="allowed="+checkBox;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	alert("settings saved");
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function loadLog(name){
+
+	alert('loading log ' + name + '.txt');
+	window.location = "http://<%=IP%>:<%=PORT%>/admin/load/log?from="+name;
+}
+
+function RemoveShift(name, id){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/remove';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	var element = document.getElementById(id);
+	    	element.parentNode.removeChild(element);
+
+	    	hide();
+
+	    }
+	}
+
+	request.send(params);
+}
+function EditShift(n,i){
+	var name = document.getElementById('wewantthis').value;
+	var rqtime = document.getElementById('rqTime').value;
+	if(rqtime == null || rqtime == undefined || rqtime == ""){
+		alert('Tavoite aika asetettava!');
+		return;
+	}
+	if(name != null && name != undefined && name.length > 0 && rqtime != null && rqtime != undefined && rqtime != ""){
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/edit';
+		var params="name="+name+"&rqTime="+rqtime+"&org="+n;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+		    if(request.readyState == 4 && request.status == 200) {
+		    	document.getElementById(i).getElementsByTagName("p")[0].innerHTML = name;
+		    	var h = rqtime.split(":")[0];
+		    	var m = rqtime.split(":")[1];
+		    	document.getElementById(i).getElementsByTagName("div")[0].onclick = function(){CreateNewShift(document.getElementById('button_thing'),name, name + i[i.length - 1], h,m)}
+		    	document.getElementById(i).id = name + i[i.length - 1];
+		    	var meta = document.getElementById(i+"-meta");
+		    	meta.dataset.hours = h;
+		    	meta.dataset.minutes = m;
+		    	hide();
+		    }
+		}
+
+		request.send(params);
+	}
+}
+function SendNewShift(){
+
+	var name = document.getElementById('wewantthis').value;
+	var rqtime = document.getElementById('rqTime').value;
+	console.log('value: ' + name);
+	if(name != null && name != undefined && name.length > 0 && rqtime != null && rqtime != undefined && rqtime != ""){
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/add';
+		var params="name="+name+"&rqTime="+rqtime;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+		    if(request.readyState == 4 && request.status == 200) {
+		    	document.getElementById("blocker").classList.toggle("hidden", true);
+		    	var copy = document.getElementById('copy').cloneNode(true);
+		    	var i = document.getElementById('vuorot').getElementsByTagName('div');
+		    	if(i == null || i == undefined) i = 0; else i = i.length - 2;
+		    	copy.id = name + i;
+		    	copy.getElementsByTagName('p')[0].innerHTML = "<b>"+name+"</b>";
+		    	var h = rqtime.split(":")[0];
+		    	var m = rqtime.split(":")[1];
+		    	copy.getElementsByTagName('div')[0].onclick = function(){ CreateNewShift(document.getElementById('button_thing'),name, name + i, h,m)}
+		    	copy.classList.toggle('hidden', false);
+		    	var target = document.getElementById('button_thing');
+		    	target.parentNode.insertBefore(copy, target);
+		    }
+		}
+
+		request.send(params);
+	}
+}
+
+function CreateNewShift(div, n, i, h,m){
+
+	var inputs = document.getElementById('blocker').getElementsByTagName("input");
+
+	if(n != null && i != null){
+		var time = h + ":" + m;
+		console.log(time);
+		var btnremove = document.getElementById("btn-remove");
+		btnremove.classList.toggle("hidden", false);
+		btnremove.onclick = function(){ RemoveShift(n,i); }
+		var btnsubmit = document.getElementById("btn-submit");
+		btnsubmit.onclick = function(){ EditShift(n,i); }
+		btnsubmit.value = "Tallenna muutokset";
+		document.getElementById("block-head").innerHTML = "Muokkaa vuoroa";
+		inputs[0].value = n;
+		inputs[1].value = time;
+
+	}else{
+		document.getElementById("btn-remove").classList.toggle("hidden", true);
+		document.getElementById("btn-submit").onclick = function(){ SendNewShift(); }
+		document.getElementById("btn-submit").value = "Tallenna uusi";
+		document.getElementById("block-head").innerHTML = "Luo uusi vuoro";
+		inputs[0].value = "";
+	}
+	document.getElementById("blocker").classList.toggle("hidden", false);
+}
+
+</script>

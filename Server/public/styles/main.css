@@ -1,0 +1,129 @@
+.hidden{
+	display: none;
+	visibility: hidden;
+}
+.styled-select {
+	margin: auto 0;
+	background-color: white;
+	margin-top: 3px;
+	height: 40px;
+	width: 200px;
+}
+.styled-select select {
+	border: 1px solid #ccc;
+	font-size: 16px;
+	padding-left: 5px;
+	border-radius: 5px;
+	font-weight: 700;
+	height: 40px;
+	width: 228px;
+}
+
+button{
+	background-color: #39db59;
+	color: white;
+}
+
+.circle{
+	border: 2px solid black;
+	width: 13px;
+	height: 13px;
+	border-radius: 50%;
+	position: absolute;
+	left: 0px; top: 50%; transform: translate(-50%,-50%);
+}
+
+.modifyMulti{
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+	left: 0;
+	top: 0;
+	background-color: rgba(0,0,0,0.85);
+}
+
+.loading{
+	visibility: hidden;
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+.loading:before{
+	visibility: visible;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: 25px;
+	font-weight: 700;
+	content: "LADATAAN PÖYTÄÄ...";
+	transform: translate(-50%, -50%);
+}
+.loading:after{
+	visibility: visible;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	content: '';
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	margin-top: -10px;
+	margin-left: -10px;
+	border-radius: 50%;
+	border: 2px solid #ccc;
+	border-top-color: #333;
+	animation: spinner .6s linear infinite;
+}
+
+.multiUsers{
+	width: 100%;
+	padding-left: 10px;
+	padding-right: 10px;
+	height: 50%;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.multiUserBtn{
+	width: 100%;
+	height: 40px;
+	position: relative;
+	background-color: white;
+	border: none;
+	margin-bottom: 5px;
+}
+.multiUserBtnP{
+	color: white;
+	text-shadow: 0 0 5px black;
+	font-weight: 700;
+	font-size: 16px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+
+
+
+@keyframes selectcolor{
+	to{
+		background-color: green;
+	}
+}
+
+@keyframes unselectcolor{
+	to{
+		background-color: grey;
+	}
+}
+
+.unselected{
+	animation: unselectcolor 0.5s linear forwards;
+}
+
+.selected{
+	animation: selectcolor 0.5s linear forwards;
+}

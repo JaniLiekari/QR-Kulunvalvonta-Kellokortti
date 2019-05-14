@@ -1,0 +1,47 @@
+<style>
+
+@keyframes hide {
+    0% {top: 0px;}
+    100% {top: -105px;}
+}
+@keyframes show {
+    0% {top: -105px;}
+    100% {top: 0px;}
+}
+
+
+.round-50{
+	border-radius: 50%;
+}
+.round-10{
+	border-radius: 10px;
+}
+
+.button{
+ 	 font-size: 16px;
+ 	 margin-left: 10px;
+ 	 text-decoration: none;
+ 	 text-align: center;
+ 	 background-color: #ededed;
+ 	 width: 100px;
+ 	 border: 1px solid #e8e8e8;
+ 	 padding: 5px;
+
+}
+
+.hide {
+ 	position: relative;
+    animation-name: hide;
+    animation-duration: 1.2s;
+    top: -105px;
+    z-index: 0;
+}
+.show {
+	position: relative;
+    animation-name: show;
+    animation-duration: 1.2s;
+    top: 0px;
+    z-index: 0;
+}
+
+</style>

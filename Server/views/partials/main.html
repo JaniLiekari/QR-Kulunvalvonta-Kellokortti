@@ -1,0 +1,884 @@
+<link rel="stylesheet" href="http://<%=IP%>:<%=PORT%>/file/css/main.css">
+
+
+<!-- PARIT APUFUNKTIOT NODE PUOLELLE. KÄYTETÄÄN ENNEN KUIN SIVU TOIMITETAAN --> 
+<!--- --------------------------------------------------------------------- -->
+
+<script type="text/javascript"> /* SULKU ON EHKÄ TURHA, EN MUISTA MIKSI LISÄTTY */
+<%
+function Is4Hours(f1, f2, requestTime){
+
+	if(requestTime == null){
+		return true;
+	}
+
+	var diff = f2.getTime() - f1.getTime();
+
+	var dhours = (diff / 1000) / 3600;
+	var hours = Math.floor(dhours);
+	var minutes = Math.floor((dhours - hours) * 60);
+	console.log("h " + hours + ": m " + minutes);
+	if(hours < requestTime[1] || hours == requestTime[1] && minutes < requestTime[2]){
+		return false;
+	}else{
+		return true;
+	}
+
+} 
+%>
+
+<%
+function GetMyShift(name){
+
+	if(shifts){
+		for(var i = 0; i < shifts.length; i++){
+			if(name == shifts[i][0]){
+				return shifts[i];
+			}
+		}
+	}
+	return null;
+
+} %>
+</script>
+
+<!--- --------------------------------------------------------------------- -->
+<!--- --------------------------------------------------------------------- -->
+
+
+
+<!--- META TIEDOT VUOROILLE -->
+<!--- --------------------- -->
+<% if(shifts){ 
+	for(var i = 0; i < shifts.length; i++){%>
+		<tag class="shifts-class" data-name1="<%=shifts[i][0]%>" data-hours="<%=shifts[i][1]%>" data-minutes="<%=shifts[i][2]%>"></tag>
+	<%}
+}%>
+
+<!--- --------------------- -->
+<!--- --------------------- -->
+
+
+
+
+
+
+
+
+<!--- FORMI TAULUKON HAKUA VARTEN -->
+<!--- --------------------------- -->
+
+<form method="get"  style="margin-top: 35px; margin-bottom: 35px; display: inline-block;">
+	<label style="margin-left: 20px;"><b>Hae taulukkoa alkaen: </b></label>
+	<% var month = SEARCHD[0].getMonth() + 1; if(month < 10){ month = "0" + month; }
+		var date = SEARCHD[0].getDate(); if(date < 10){date = "0" + date; } %>
+
+	<% var month1 = SEARCHD[1].getMonth() + 1 ; if(month1 < 10){ month1 = "0" + month1; }
+		var date1 = SEARCHD[1].getDate(); if(date1 < 10){date1 = "0" + date1; } %>
+	<input style="min-width: 150px; margin-left: 10px;" type="date" name="startDay" value="<%= SEARCHD[0].getFullYear() %>-<%= month %>-<%= date %>">
+	<label><b> -asti: </b></label>
+	<input style="min-width: 150px; margin-left: 10px;" type="date" name="endDay" value="<%= SEARCHD[0].getFullYear() %>-<%= month1 %>-<%= date1 %>">
+	<p style="margin-left: 10px; display: inline-block;"><b>Vuorosta: </b><div style="display: inline-block; margin-left: 5px;" class="styled-select">
+		<select id="shift2" name="shift" value="">
+			<option value="full_list">Kaikki</option>
+			<% if(shifts) { %>
+				<% for(var i = 0; i < shifts.length; i++) { %>
+					<option value="<%= shifts[i][0] %>" <% if(SEARCHD[2] == shifts[i][0]) {%>selected<%}%>><%= shifts[i][0] %></option>
+				<%}%>
+			<%}%>
+  		</select>
+  	</div>
+  	<p style="margin-left: 35px; display: inline-block;"><b>Vastuuhenkilö: </b><div style="display: inline-block; margin-left: 5px;" class="styled-select">
+		<select id="vastuu" name="vastuu" value="">
+			<option value="full_list">Kaikki</option>
+			<% if(vastuu) { %>
+				<% for(var i = 0; i < vastuu.length; i++) { %>
+					<option value="<%= vastuu[i] %>" <% if(SEARCHD[3] == vastuu[i]) {%>selected<%}%>><%= vastuu[i] %></option>
+				<%}%>
+			<%}%>
+			<option value="no_add" <%if(SEARCHD[3] == "no_add") { %>selected<%}%>>Ei lisätty</option>
+  		</select>
+  	</div>
+	<input style="min-width: 100px; margin-left: 40px; margin-top: -2px; background-color: #39db59; color: white; font-weight: bold;" type="submit" class="btn" value="Hae">
+</form>
+<button onclick="HideShowVapaa(this)" style="margin-left: 30px; margin-bottom: 20px; border: none; padding-top: 5px; padding-bottom: 5px; display: inline-block;">Näytä vapaapäivät</button>
+
+
+
+<!--- --------------------------- -->
+<!--- --------------------------- -->
+
+
+
+
+
+<!--- TAULUKKO -->
+<!--- -------- -->
+
+
+<div id="print">
+
+
+
+	<!--- DATATABLESIIN TOIMIMISEEN TARVITTAVAT TIEDOSTOT -->
+	<!--- -----------https://datatables.net/------------- -->
+
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
+
+	<!--- ----------------------------------------------- -->
+	<!--- ----------------------------------------------- -->
+
+
+
+
+
+
+
+
+
+	<!--- TABLEN SOMISTUS FIXI CSS -->
+	<!--- ------------------------ -->
+
+	<style type="text/css">
+		
+		.no-footer{
+			border-bottom: none !important;
+		}
+		.table-first-block{
+			border-right: 1px solid black;
+			width: 200px !important;
+		}
+
+	</style>
+
+	<!--- ------------------------ -->
+	<!--- ------------------------ -->
+
+
+
+	<table id="table" class="table order-column loading" style="width: 100%;">
+
+		<thead>
+			<tr>
+			<th></th>
+		     <% if(data !== null){
+					for(var i = 0; i < data[0].length; i++){ %>
+						<th class="table-block" style="min-width: 150px;" onclick="modifyMulti(<%=data[0][i].getDate()%>, <%=data[0][i].getMonth()%>,<%=data[0][i].getFullYear()%>);">
+							<% if(data[0][i].getDay() === 1) { %>
+								<p>Maanantai</p> 
+							<% } else if(data[0][i].getDay() === 2) { %>
+								<p>Tiistai</p>  
+							<% } else if(data[0][i].getDay() === 3) { %>
+								<p>Keskiviikko</p>  
+							<% } else if(data[0][i].getDay() === 4) { %>
+								<p>Torstai</p> 
+							<% } else if(data[0][i].getDay() === 5) { %>
+								<p>Perjantai</p> 
+							<% } %>
+							<p><%=data[0][i].getDate()+"."+(data[0][i].getMonth()+1)+"."+data[0][i].getFullYear()%></p>
+						</th>
+					<% } %>
+			<% } else { %> <p> data is null </p> <% } %>
+
+		</thead>
+
+		<tbody id="fixed-body">
+			
+			<% if(data.length > 1 && data[1]['firstname'] != null) { %>
+
+
+				<% for(var i = 1; i < data.length; i++) { %>
+
+					<tr>
+
+					<% function GET_NAME(firstname, lastname){
+
+						if(PAGESETTINGS == 'Mikko M.'){
+								return firstname +' '+ lastname[0] + '.';
+						}
+						else if(PAGESETTINGS == 'Mallikas M.'){
+							return lastname +' '+ firstname[0] + '.';
+						}
+						else{
+							return firstname + ' ' + lastname;
+						}
+
+					}%>
+
+
+					<!--- CLIENTIN NIMI --->
+
+					<td id="<%= data[i]['firstname'] + data[i]['lastname'] %>-name" class="table-first-block"><a href="http://<%=IP%>:<%=PORT%>/admin/client/info?firstname=<%= data[i]['firstname'] %>&lastname=<%= data[i]['lastname'] %>" style="width: 150px; color: black; cursor: pointer; text-decoration: none;"><b><%= GET_NAME(data[i]['firstname'], data[i]['lastname'])%></b></a></td>
+
+
+					<%<!--- LOOPATAAN CLIENTIN JOKAINEN PÄIVÄ LÄPI --->%>
+					<% var target = 0; 
+					for(var j = 0; j < data[0].length; j++) { %>
+
+						<!--- CLIENTIN META TIEDOT --->
+						<tag id="<%= data[i]['firstname'] + data[i]['lastname'] + '.' + j %>-meta" data-i="<%= j %>" data-id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>" data-firstname="<%= data[i]['firstname'] %>" data-lastname="<%= data[i]['lastname'] %>" data-date="<%= data[0][j] %>" data-shift="<%= data[i]['shift']%>"></tag>
+
+						<!--- HOLDERI PÄIVÄN TIEDOILLE JA MUOKKAAMISELLE --->
+						<td id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-day" class="table-block">
+						
+
+
+							<!--- MUOKKAIN --->
+
+							<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-editor" class="hidden">
+
+							 	<input id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-edit_in" type="time" name="intime" min="07:00" max="18:00"><br>
+							 	<input id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-edit_out" type="time" name="outtime" min="07:00" max="18:00">
+							 	<div class="checkbox" style="width: 120px; position: relative; margin-top: 10px;">
+							 		<label>
+							 			Työpäivä:
+							 			<input style="margin-left: 4px;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-workday" type="checkbox" name="isWorkDay" <% if(data[i]['days'][target][3] == true) { %>Checked<%}%> />
+									</label>
+							 	</div>
+							 	<button style="border: none; border-radius: 5px; height: 25px;" onclick="EditDone('<%= data[i]['firstname'] + data[i]['lastname'] %>', <%= j %>)"><b>Valmis!</b></button>
+
+							</div>
+
+
+							<!--- TARKISTETAAN ONKO CLIENTILLÄ AKTIIVISTA DATAA KYSEISENÄ PÄIVÄNÄ --->
+							<% var isActive = (data[i]['days'] == null || data[i]['days'][target] == null || data[i]['days'][target][0].getDate() != data[0][j].getDate() || data[i]['days'][target][0].getMonth() != data[0][j].getMonth() || data[i]['days'][target][0].getFullYear() != data[0][j].getFullYear()) ? false : true %>
+
+
+							<!--- TÄSTÄ ALKAAKIN SITTEN SELVITTELY, ONNEA MATKAAN! --->
+
+							<div style="cursor: pointer; position: relative; width: 100%; height: 100%;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-button" 
+																							<% if(privileges[0]){ %>
+																									onclick="ChangeUserInfo('<%= 
+																										data[i]['firstname'] + data[i]['lastname'] %>', <%= 
+																									j %>, '<% 
+																									if(isActive == true && data[i]['days'][target][1]){%><%= 
+																										('0' + data[i]['days'][target][1].getHours()).slice(-2) + ':' + ('0' + data[i]['days'][target][1].getMinutes()).slice(-2) %><%}
+																									else{
+																										%><%}
+																									%>', '<% 
+																									if(isActive == true && data[i]['days'][target][2]){%><%= 
+																										('0' + data[i]['days'][target][2].getHours()).slice(-2) + ':' + ('0' + data[i]['days'][target][2].getMinutes()).slice(-2)%><%}
+																									else{
+																										%><%
+																									}%>')
+																									<%}%>" class="<% if(data[i]['days'][target][3] != true){
+																											%>Vapaa hidden<%
+																									}%>">
+
+
+									<p style="margin-left: 20px;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-null" class="<% if((data[i]['days'][target][1] != null|| data[i]['days'][target][2] != null) && data[i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data[i]['days'][target][3] == true){%>Poissa<% }else{ %>Vapaa<% } %></p>
+
+
+									<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-data" class="<% if(data[i]['days'][target][3] == false || (data[i]['days'][target][1] == null && data[i]['days'][target][2] == null)) { %>hidden<% } %>" style="position: relative; padding-left: 20px;">
+							 			<% var color; var b_color;
+							 			if(isActive == true && data[i]['days'][target][1] != null && isActive == true && data[i]['days'][target][2] != null) {
+
+							 				var f1 = data[i]['days'][target][1]; var f2 = data[i]['days'][target][2];
+							 				if(Is4Hours(f1, f2, GetMyShift(data[i]['shift'])) == true){
+							 					color = "green";
+							 					b_color = "#83ff70";
+							 				}else{
+							 					color = "red";
+							 					b_color = "#ff7070";
+							 				}
+
+							 			} else if(isActive == true && data[i]['days'][target][1] != null || isActive == true && data[i]['days'][target][2] != null) {
+							 				color = "yellow";
+							 				b_color = "#ffff84";
+							 			} %>
+ 							 			<p id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-in">Sisään: <% if(isActive == true && data[i]['days'][target][1] != null) { %><%= ("0" + data[i]['days'][target][1].getHours()).slice(-2) + ":" + ("0" + data[i]['days'][target][1].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+							 			<p id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-out">Ulos: <% if(isActive == true && data[i]['days'][target][2] != null) { %><%= ("0" + data[i]['days'][target][2].getHours()).slice(-2) + ":" + ("0" + data[i]['days'][target][2].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+							 		</div>
+							 		<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-bubble" class="circle <%if(data[i]['days'][target][3] == false  || (data[i]['days'][target][1] == null && data[i]['days'][target][2] == null)){%>hidden<%}%>" style="background-color: <%= color %>; border-color:  <%= b_color %>;"></div>
+							 		<% if(isActive) target++; %> 
+
+
+							</div> <!--- !___SULKU___! "TÄSTÄ ALKAAKIN SITTEN SELVITTELY, ONNEA MATKAAN!" !___SULKU___! --->
+
+
+						</td> <!--- !___SULKU___!"" HOLDERI PÄIVÄN TIEDOILLE JA MUOKKAAMISELLE" !___SULKU___! --->
+
+
+
+
+					<% } %> <!--- LOOPATAAN CLIENTIN JOKAINEN PÄIVÄ LÄPI LOPPU --->
+
+				<% } %> <!--- LOOPATAAN JOKAINEN SAATU KÄYTTÄJÄ LÄPI LOPPU --->
+
+			<% } %>
+
+
+		</tbody>
+
+
+	</table>
+
+	
+
+
+</div> <!--- !___SULKU___! "TAULUKKO" !___SULKU___!-->
+
+
+	
+	<!-- DATATABLESIN INIT SCRIPTI -->
+
+	<script type="text/javascript">
+
+		var datadata = "";
+		var dataTable = 
+		document.getElementById("table").classList.toggle('loading', false);
+
+		if(document.getElementById("print"))
+			datadata = document.getElementById("print").innerHTML;
+
+		dataTable = $('#table').DataTable({
+	    	scrollY: 600,
+	    	scrollX: true,
+		    scrollCollapse: true,
+		    paging: false,
+		    searching: false,
+		    ordering: false,
+		    info: false,
+		   	fixedColumns:   {
+	            leftColumns: 1
+	       	}
+		});
+
+
+
+
+
+
+
+	</script>
+
+	<!-- ----------------------- -->
+
+
+
+<div id="modifyMulti" class="modifyMulti hidden">
+	
+
+	<div style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; height: 500px; background-color: white;">
+		
+
+		<div style="text-align: center; padding-top: 30px; padding-bottom: 30px;">
+			<p style="font-weight: 700; margin-bottom: 2px; font-size: 20px;">Monimuokkaus:</p>
+			<p id="modifyMulti-header" style="font-weight: 700;"></p>
+		</div>
+
+
+		<div id="modifyMulti-users" class="multiUsers"></div>
+
+		<div id="modifyMulti-data" style="padding-top: 10px; padding-left: 30px; padding-right: 30px;">
+
+
+				<div style="width: 100%; text-align: center;"><p><b>Kirjautumisajat: </b></p></div>
+				<div style="float: left;">
+					<p style="margin-bottom: 2px;">Sisään: </p>
+					<input id="modifyMulti-time_in" type="time" name="outtime" min="00:00" max="23:59">
+				</div>
+				<div style="float: left; margin-left: 10px;">
+					<p style="margin-bottom: 2px;">Ulos: </p>
+					<input id="modifyMulti-time_out" type="time" name="outtime" min="00:00" max="23:59">
+				</div>
+				<div style="float: right; bottom: 10px; right: 30px; position: absolute;">
+					<button style="width: 120px; height: 35px;" onclick="multiEditSend();">Tallenna</button>
+				</div>
+
+		</div>
+
+
+		<div style="position: absolute; right: 10px; top: 10px; width: 20px; height: 20px; border-radius: 50%; background-color: red; cursor: pointer;" onclick="CloseMulti();"><p style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: white;"><b>X</b><p></div>
+
+
+
+	</div>
+
+
+
+</div>
+
+
+
+<button style="margin-left: 10px; margin-top: 10px; margin-bottom: 20px;" class="btn" onclick="print_and_submit()"><b>Avaa taulukko uudessa ikkunassa</b></button>
+
+<% if(plugins) { %>
+	<%for(var i = 0; i < plugins.length; i++){ %>
+		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+				 <% if(hook[0] == "MainTable") { %>
+				 	<% if(hook[1] == "END_BEFORE_SCRIPT") { %>
+
+				 		<%- include(hook[2])%> 
+
+				 	<%}%>
+				 <%}%>
+
+			<%}%>
+
+		<%}%>
+	<%}%>
+<%}%>
+
+
+<script type="text/javascript">
+
+
+	var selectedUsers = [];
+	function CloseMulti(){
+
+		var myNode = document.getElementById("modifyMulti-users");
+
+		while (myNode.firstChild) {
+   			myNode.removeChild(myNode.firstChild);
+		}
+
+
+		document.getElementById("modifyMulti").classList.toggle("hidden", true);
+
+		selectedUsers = [];
+
+	}
+
+	function multiEditSend(){
+
+		if(selectedUsers != null && selectedUsers.length > 0){
+
+
+			for(var i = 0; i < selectedUsers.length; i++){
+				var name = selectedUsers[i].dataset.firstname + selectedUsers[i].dataset.lastname;
+				var day = selectedUsers[i].dataset.i;
+
+				var invalue = document.getElementById(name+day+"-in").innerHTML.split(":");
+				if(invalue.length == 3)
+					invalue = invalue[1] +":"+invalue[2];
+				else
+					invalue = "";
+
+				var outvalue = document.getElementById(name+day+"-out").innerHTML.split(":");
+				if(outvalue.length == 3)
+					outvalue = outvalue[1] + ":" + outvalue[2];
+				else
+					outvalue = "";
+
+				var data_out = document.getElementById(name+""+day+"-out");
+				var data_in = document.getElementById(name+""+day+"-in");
+				var outTime = document.getElementById("modifyMulti-time_out").value;
+				var inTime = document.getElementById("modifyMulti-time_in").value;
+
+				if(outTime == ""){
+
+					if(outvalue == ""){
+						data_out.innerHTML = "Ulos: Puuttuu";
+					}else{
+						data_out.innerHTML = "Ulos: "+outvalue;
+					}
+					outTime = outvalue;
+
+				}else{
+					data_out.innerHTML = "Ulos: "+outTime;
+				}
+
+				if(inTime == ""){
+				
+					if(invalue== ""){
+						data_in.innerHTML = "Sisään: Puuttuu";
+					}else{
+						data_in.innerHTML = "Sisään: "+invalue;
+					}
+					inTime = invalue;
+
+				}else{
+					data_in.innerHTML = "Sisään: "+inTime;
+				}
+
+				
+
+
+
+				SaveData(name, day,inTime, outTime, document.getElementById(name+""+day+"-workday").checked);
+			}
+
+		}
+
+		CloseMulti();
+
+	}
+
+	function multiAdd(meta){
+
+		if(selectedUsers.includes(meta)){
+			var id = meta.dataset.id + "-multiEdit";
+			console.log(id);
+			var i = selectedUsers.indexOf(meta);
+			if(i > -1){
+				selectedUsers.splice(i, 1);
+			}
+			document.getElementById(id).classList.toggle('selected', false);
+			document.getElementById(id).classList.toggle('unselected', true);
+
+		}else{
+			var id = meta.dataset.id + "-multiEdit";
+			console.log(id);
+			selectedUsers.push(meta);
+			document.getElementById(id).classList.toggle('unselected', false);
+			document.getElementById(id).classList.toggle('selected', true);
+		}
+
+	}
+
+	function modifyMulti(date, month, year){
+
+		selectedUsers = [];
+		document.getElementById("modifyMulti").classList.toggle("hidden");
+		console.log(date + "." + month + "." + year);
+		document.getElementById("modifyMulti-header").innerHTML = date + "." + month + "." + year;
+		var print = document.getElementById("print");
+		var tags = print.getElementsByTagName("tag");
+
+		var users = document.getElementById('modifyMulti-users');
+
+
+		for(var i = 0; i < tags.length; i++){
+			var id = tags[i].id.substring(0, tags[i].id.length - 4);
+			var meta = document.getElementById(id+"meta");
+			var cdate = new Date(meta.dataset.date);
+			if(cdate.getFullYear() == year && cdate.getMonth() == month && cdate.getDate() == date){
+				
+
+				var fname = meta.dataset.firstname;
+				var lname = meta.dataset.lastname;
+
+				id=meta.dataset.id;
+
+
+				var wd = (document.getElementById(id+"-null").innerHTML == "Vapaa") ? false : true;
+
+				if(wd){
+
+					var isIn = true;//(document.getElementById(id+"-in").innerHTML == "Sisään: Puuttuu") ? false : true;
+					if(isIn){
+
+
+						var button = document.createElement('button');
+						var p = document.createElement("p");
+
+
+						button.id = id + "-multiEdit";
+						console.log(button.id);
+						p.classList.toggle("multiUserBtnP");
+						
+						button.classList.toggle("multiUserBtn");
+						button.classList.toggle("unselected");
+
+						button.appendChild(p);
+						
+
+						p.innerHTML = fname + " " + lname;
+
+						users.appendChild(button);
+
+						multiEditAddList(button,meta);
+
+
+
+
+					}
+
+
+				}
+
+
+			}
+
+			
+		} 
+
+		if(users.firstChild == null || users.firstChild == "" || users.firstChild == undefined){
+			var d = document.createElement("div");
+			d.style.width = "100%";
+			d.style.textAlign = "center";
+			var p = document.createElement("p");
+			p.innerHTML = "SOPIVIA KÄYTTÄJIÄ EI LÖYTYNYT!";
+			d.appendChild(p);
+			users.appendChild(d);
+
+			document.getElementById("modifyMulti-data").classList.toggle("hidden", true);
+
+		}else{
+			console.log(users.firstChild);
+			document.getElementById("modifyMulti-data").classList.toggle("hidden", false);
+		}
+	}
+
+	function multiEditAddList(btn,meta){
+		btn.onclick = function(){
+						
+						
+							multiAdd(meta);
+
+		};
+	}
+
+	var show = false;
+
+	function HideShowVapaa(btn){
+		var vapaat = document.getElementsByClassName('Vapaa');
+		for(var i = 0; i < vapaat.length; i++){
+			vapaat[i].classList.toggle('hidden', show);
+		}
+
+		if(show == false){
+			btn.innerHTML = "Piiloita vapaapäivät";
+		}else{
+			btn.innerHTML = "Näytä vapaapäivät";
+		}
+
+		show = !show;
+	}
+
+	function GetMyShift(name){
+
+		var ele = document.getElementsByClassName("shifts-class");
+
+		if(ele){
+			for(var i = 0; i < ele.length; i++){
+				console.log(ele[i].dataset.name1 + ":" + name);
+				if(ele[i].dataset.name1 == name){
+					var temp = [];
+					temp.push(ele[i].dataset.name1);
+					temp.push(ele[i].dataset.hours);
+					temp.push(ele[i].dataset.minutes);
+					return temp;
+				}
+			}
+		}
+		return null;
+
+	}
+	
+	function print_and_submit(){
+		var myWindow = window.open("", "MsgWindow", "width=800,height=600");
+		myWindow.document.write("<html>");
+		myWindow.document.write("<script src=http://<%=IP%>:<%=PORT%>/file/js/jquery-3.3.1.js type=text/javascript>");
+		myWindow.document.write("</scr" + "ipt>");
+		myWindow.document.write("<link rel=stylesheet href=/styles/bootstrap.min.css>");
+		myWindow.document.write("<style type=text/css>.first{border-right: solid 2px #d6d6d6;}.hidden{display: none;visibility: none;}</style>");
+		myWindow.document.write("<body>");
+		myWindow.document.write("<style>@page{margin: 0; size: landscape;}</style>");
+		myWindow.document.write("<div>");
+		myWindow.document.write(datadata);
+		myWindow.document.write("</div>");
+		myWindow.document.write("</body>");
+		myWindow.document.write("</html>");
+	}
+
+	function ChangeUserInfo(user, day, inT, outT){
+
+		var main = document.getElementById(user+"-name");
+		var dayE = document.getElementById(user+""+day+"-day");
+		var button = document.getElementById(user + day + "-button")
+		button.classList.toggle('hidden');
+		var editor = document.getElementById(user+""+day+"-editor");
+		var inputs = editor.getElementsByTagName('input');
+		inputs[0].value = inT;
+		inputs[1].value = outT;
+		editor.classList.toggle('hidden');
+	}
+	function Is4Hours(f1, f2, requestTime){
+		if(requestTime == null){
+			console.log("null");
+			return true;
+		}
+
+		var diff = f2.getTime() - f1.getTime();
+
+		var dhours = (diff / 1000) / 3600;
+		var hours = Math.floor(dhours);
+		var minutes = Math.floor((dhours - hours) * 60);
+		console.log("h " + hours + ": m " + minutes);
+		if(hours < requestTime[1] || hours == requestTime[1] && minutes < requestTime[2]){
+			return false;
+		}else{
+			return true;
+		}
+
+	}
+	function SaveData(user, day, in_r, out_r, workDay){
+		var meta_name = document.getElementById(user+"."+day+"-meta");
+		var firstname = meta_name.dataset.firstname;
+		var lastname = meta_name.dataset.lastname;
+		var ddate = meta_name.dataset.date;
+		var time_in = in_r.split(':');
+		var time_out = out_r.split(':');
+		var in_d = new Date(ddate);
+
+
+
+
+		if(in_r != ""){
+
+			in_d.setHours(time_in[0]);
+			in_d.setMinutes(time_in[1]);
+
+		}else{
+			in_d = "";
+		}
+
+		var out_d = new Date(ddate);
+		if(out_r != ""){
+			out_d.setHours(time_out[0]);
+			out_d.setMinutes(time_out[1]);
+		}else{
+			out_d = "";
+		}
+		
+
+
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/client/edit';
+		var params='firstname='+firstname+"&lastname="+lastname + "&ddate="+ddate+"&din="+in_d+"&dout="+out_d+"&isWorkDay="+workDay;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+	    	if(request.readyState == 4 && request.status == 200) {
+	    		console.log("done");
+
+	    		var data = document.getElementById(user+day+"-data");
+	    		var nul = document.getElementById(user+day+"-null");
+	    		if((workDay == true && in_d == "" && out_d == "") || workDay == false){
+	    			nul.classList.toggle("hidden", false);
+	    			if(in_d == "" && out_d == "" && workDay == true){
+	    				nul.innerHTML = "Poissa";
+	    			}else{
+	    				nul.innerHTML = "Vapaa";
+	    			}
+	    			data.classList.toggle("hidden", true);
+
+	    			console.log("lol");
+
+	    			if(workDay == true)
+	    				document.getElementById(user+day+"-button").classList.toggle('Vapaa',false);
+	    			else{
+	    				if(show == false){
+	    					document.getElementById(user+day+"-button").classList.toggle('hidden',true);
+	    				}
+	    				document.getElementById(user+day+"-button").classList.toggle('Vapaa',true);
+	    			}
+	    		}else{
+	    			nul.classList.toggle("hidden", true);
+	    			data.classList.toggle("hidden", false);
+
+
+	    			if(workDay == true)
+	    				document.getElementById(user+day+"-button").classList.toggle('Vapaa',false);
+	    			else{
+	    				if(show == false){
+	    					document.getElementById(user+day+"-button").classList.toggle('hidden',true);
+	    				}
+	    				document.getElementById(user+day+"-button").classList.toggle('Vapaa',true);
+	    			}
+
+	    			
+	    		}
+
+	    		var bubble = document.getElementById(user+day+"-bubble");
+	    		if(in_d == "" && out_d == ""){
+	    			bubble.classList.toggle("hidden", true);
+	    		}else if(in_d != "" && out_d != ""){
+	    			bubble.classList.toggle("hidden", false);
+	    			if(Is4Hours(in_d, out_d, GetMyShift(meta_name.dataset.shift))){
+	    				bubble.style.backgroundColor = "green";
+	    				bubble.style.borderColor = "#83ff70";
+	    			}else{
+	    				bubble.style.backgroundColor = "red";
+	    				bubble.style.borderColor = "#ff7070";
+	    			}
+	    		}else{
+	    			bubble.classList.toggle("hidden", false);
+	    			bubble.style.backgroundColor ="yellow";
+	    			bubble.style.borderColor = "#ffff84";
+	    		}
+
+	    		if(workDay == false){
+	    			bubble.classList.toggle("hidden", true);
+	    		}
+
+	    		dataTable.columns.adjust().draw();
+	    	}
+		}
+
+		request.send(params);
+	}
+
+	function EditDone(user, day){
+		
+		var dayE = document.getElementById(user+""+day+"-day");
+		var button = document.getElementById(user + "" + day + "-button")
+		var editor = document.getElementById(user+""+day+"-editor");
+		var edit_in = document.getElementById(user+""+day+"-edit_in");
+		var edit_out = document.getElementById(user+""+day+"-edit_out");
+		var null_data = document.getElementById(user+""+day+"-null");
+		var data_in = document.getElementById(user+""+day+"-in");
+		var data_out = document.getElementById(user+""+day+"-out");
+		var data = document.getElementById(user+""+day+"-data");
+		var workDay = document.getElementById(user+""+day+"-workday").checked;
+
+		if( edit_in.value != "" || edit_out.value != ""){
+			null_data.classList.toggle('hidden', true);
+			data.classList.toggle('hidden', false);
+
+			if(edit_in.value != ""){
+				data_in.innerHTML = "Sisään: " + edit_in.value;
+			}else{
+				data_in.innerHTML = "Sisään: Puuttuu";
+			}
+			if(edit_out.value != ""){
+				data_out.innerHTML = "Ulos: " + edit_out.value;
+			}else{
+				data_out.innerHTML = "Ulos: Puuttuu";
+			}
+		}else{
+			data.classList.toggle('hidden', true);
+			null_data.classList.toggle('hidden', false);
+			data_in.innerHTML = "Sisään: Puuttuu";
+			data_out.innerHTML = "Ulos: Puuttuu";
+		}
+
+		button.onclick = function() { ChangeUserInfo(user,day,edit_in.value,edit_out.value); };
+
+		editor.classList.toggle('hidden');
+		button.classList.toggle('hidden');
+
+		SaveData(user, day, edit_in.value, edit_out.value, workDay);
+	}
+
+</script>
+
+
+<% if(plugins) { %>
+	<%for(var i = 0; i < plugins.length; i++){ %>
+		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+				 <% if(hook[0] == "MainTable") { %>
+				 	<% if(hook[1] == "END") { %>
+				 	 
+				 		<%- include(hook[2])%> 
+
+				 	<%}%>
+				 <%}%>
+
+			<%}%>
+
+		<%}%>
+	<%}%>
+<%}%>
+

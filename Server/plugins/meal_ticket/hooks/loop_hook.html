@@ -1,0 +1,36 @@
+<button style="margin-left: 10px; margin-top: 10px; margin-bottom: 20px;" class="btn" onclick="LOOP();"><b>Tulosta aterialiput</b></button>
+
+
+
+
+<script type="text/javascript">
+	
+
+	var USERNAMES = [];
+
+
+	function LOOP(){
+		if(USERNAMES.length > 0){
+			for(var i = 0; i < USERNAMES.length; i++){
+				BuildAsset(USERNAMES[i][0]+" "+USERNAMES[i][1]);
+			}
+		}
+	}
+
+
+	function SaveUsernames(){
+
+		  <% if(data !== null && data.length > 1){ %>
+
+		  		<% for(var i = 1; i < data.length; i++){ %>
+
+		  			USERNAMES.push(["<%= data[i]['firstname'] %>","<%= data[i]['lastname'] %>"]);
+
+		  		<% } %>
+
+		  <% } %>
+
+	}
+
+	SaveUsernames();
+</script>

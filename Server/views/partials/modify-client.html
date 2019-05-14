@@ -1,0 +1,696 @@
+<% include ./css/pad-css.html %>
+<% include ./css/findbar-css.html %>
+
+<!--- HAKU VALIKKO --->
+<style type="text/css">
+	#print{
+		box-shadow: 2px 2px 5px black;
+		outline: none;
+	}
+
+	.client_select{
+		position: relative;
+		height: 40px;
+		background-color: #39db59;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		padding-left: 5px;
+		width: 400px;
+		margin-top: 10px;
+
+		transition-duration: 50ms;
+	}
+
+	.client_select:hover{
+		background-color: #195926;
+	}
+
+	.form-div{
+
+		width: 500px;
+		min-height: 400px;
+		background-color: white;
+		border-radius: 10px;
+		padding-bottom: 30px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.styled-select {
+		margin: auto 0;
+	   	background-color: white;
+	   	margin-top: 3px;
+	   	height: 40px;
+	   	width: 200px;
+	}
+	.styled-select select {
+	   border: 1px solid #ccc;
+	   font-size: 16px;
+	   padding-left: 5px;
+	   border-radius: 5px;
+	   font-weight: 700;
+	   height: 40px;
+	   width: 228px;
+	}
+	.circle{
+		border: 2px solid black;
+		width: 13px;
+		height: 13px;
+		border-radius: 50%;
+		position: absolute;
+		left: 5px; top: 50%; transform: translate(-50%,-50%);
+	}
+
+</style>
+
+<script type="text/javascript">
+<%
+function Is4Hours(f1, f2){
+	var diff = f2.getTime() - f1.getTime();
+
+	var hours = (diff / 1000) / 3600;
+	if(hours < 4){
+		return false;
+	}else{
+		return true;
+	}
+
+} %>
+</script>
+
+<div id="findbar" class="container-fluid show" style="padding-top: 0px; padding-bottom: 20px; box-shadow: 0px 5px 5px grey;">
+	<div>
+		<form id="form">
+			<div class="form-inline">
+				<input onchange="" id="firstname" type="text" name="firstname" value="" placeholder="Etunimi">
+				<input onchange="" id="lastname" type="text" name="lastname" value="" placeholder="Sukunimi">
+				<button style="background-color: #39db59; color: white;" class="button round-10" onclick=""><b>Etsi</b></button>
+			</div>
+		</form>
+	</div>
+	<button onclick="show_hide(this)" style="position: absolute; text-align: center; height: 35px; width: 150px; margin-top: 20px; right: 30px; box-shadow: 0px 5px 5px grey; background-color: white;">Piiloita haku</button>
+</div>
+
+<% if(names != null) { %>
+
+	<div style="padding-left: 20px; padding-top: 40px;">
+		<p style="font-size: 20px; margin-bottom: 0px; color: black; font-weight: 700">Kävijöitä: <%= names.length %>kpl</p>
+	</div>
+
+
+	<div style="padding-left: 20px; margin-top: 0px; font-weight: bold; font-size: 20px; color: white; ">
+		<p style="font-size: 24px; margin-bottom: 20px; color: black;">Kävijät:</p>
+		<% for(var i = 0; i < names.length; i++){ %>
+			<div class="client_select" onclick="redirectTo('<%= names[i][0] %>','<%= names[i][1] %>');">
+				<% name = "";
+					if(pageSettings == null || pageSettings == "Mikko M." || pageSettings == "Mikko Mallikas"){
+						name = names[i][0] + " " + names[i][1];
+					} else{
+						name = names[i][1] + " " + names[i][0];
+					}
+				%>
+				<p style="position: absolute; left: 20px; top: 50%; transform: translate(0, -50%);"><%= name %></p>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+<!--- KORTTI JA TIETOJA --->
+<div class="<% if (data == null ) { %> hidden <% } %>" style="width: 100%; background-color: #39db59; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; color: white; border-top: 1px solid #1d9134;">
+	<p style="margin: auto; font-size: 30px"><b>Kortti ja tietoja</b></p>
+</div>
+<div id="show" class="<% if (data == null ) { %> hidden <% } %>" style="margin-top: 10px; margin-left: 20px;">
+	<div class="row">
+		<div class="col">
+			<div id="print">
+				<div id="head" style="text-align: center; width: 100%;">
+					<img src="http://<%=IP%>:<%=PORT%>/file/img/syke_logo.png" alt="" height="135" width="390">
+					<!--<p style="padding-top: 3px">Tampereen työvalmennussäätiö Syke</p>-->
+				</div>
+				<div class="row" style="width: 100%">
+				    <div class="col-md-auto">
+
+				      	<img id="qr_image" src="http://<%=IP%>:<%=PORT%>/admin/qrcode/API/<% if (data != null ) { %><%=data['qr']%><% } %>" alt="<% if (data != null ) { %><%=data['qr']%><% } %>" height="240" width="240" style="margin-left: 0px">
+				    </div>
+				    <div class="col-6" style="min-height: 200px" >
+				    	<div id="center" class="" style="width: 100%;  position: absolute; text-align: center;">
+								<p id="p_name" style="margin-top: 60px; font-size: 35px; font-weight: bold;"><% if (data != null ) { %> <%= data['name'] %> <% } %></p>
+						</div>
+				      	<div id="bottom" class="" style="width: 100%; text-align: center; position: absolute;  bottom: 0px;">
+								<p id="p_unit"style="font-size: 20px; margin-bottom: 0px"><% if (data != null ) { %> <%= data['unit'] %> <% } %></p>
+								<p id="p_shift"style="font-size: 18px; bottom: 0px;"><% if (data != null ) { %> <%= data['shift'] %> <% } %></p>
+						</div> 
+				    </div>
+				 </div>
+				 <div style="margin-top: 10px"></div>
+			</div>
+			<button style="background-color: #39db59; border-style: none; border-radius: 5px; margin-top: 10px; margin-left: 25px; width: 100px; height: 40px; color: white;" onclick="print()"><b>Tulosta</b></button>
+		</div>
+		<div class="col" style="margin-top: 50px;">
+			<h3><b><ins>Tietoja</ins></b></h3>
+			<p><b>Nimi: </b><% if(data != null){%><%=data['firstname']+" "+data['lastname']%><%}%></p>
+			<p><b>Keskimääräinen oleskeluaika: </b><% if (data != null ) { %><%= data['average_Time'] %><% } %></p>
+			<p><b>Viikon keskimääräinen oleskeluaika: </b><% if(data != null) { %><%= data['average_Week'] %><% } %></p>
+			<p><b>Maximi aika: </b><% if (data != null ) { %><%= data['maxTime'] %><% } %></p>
+			<p><b>Minimi aika: </b><% if (data != null ) { %><%= data['minTime'] %><% } %></p>
+			<p style="<% if(vastuu == "Ei lisätty") { %> <%="color: red" %><%}%>"><b>Vastuuhenkilö: </b><%=vastuu%></p>
+			<% if(privileges[3] === true) { %><button class="btn" style="background-color: #39db59; height: 40px; border-radius: 10px; color: white; padding-left: 10px; padding-right: 10px; border: 1px solid green;" onclick="editUser('<% if (data != null ) { %><%= data['qr'] %><% } %>');"><b>Muokkaa kävijää</b></button> <% } %>
+
+
+			<% if(plugins) { %>
+				<%for(var i = 0; i < plugins.length; i++){ %>
+				 	<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+				 		<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+				 			<% if(hook[0] == "Modify-client") { %>
+				 					<% if(hook[1] == "CLIENT_ACTIONS") { %> 
+				 						<%- include(hook[2])%> 
+				 					<% } %>
+				 			<%	} %>
+				 		<% } %>
+				 	<% } %>
+				<%	} %>
+			<% } %>
+
+			<% if(privileges[2] === true) { %> <button class="btn btn-danger" onClick="RemoveUser();"><b>Poista käyttäjä!</b></button> <% } %>
+		</div>
+	</div>
+</div>
+
+<!--- TÄMÄN KUUN KIRJAUTUMISET --->
+<div class="<% if (data == null ) { %> hidden <% } %>" style="width: 100%; background-color: #39db59; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; margin-top: 30px; color: white; border-top: 1px solid #1d9134;">
+	<p style="margin: auto; font-size: 30px"><b>Kirjautumis tiedot</b></p>
+</div>
+<% if (data != null && data['loggin'] != null) { %>
+<form class="<% if (data == null ) { %> hidden <% } %>" action="/admin/client/info" method="get"  style="margin-top: 35px; margin-bottom: 35px;">
+	<label style="margin-left: 20px;"><b>Hae taulukkoa alkaen: </b></label>
+	<input style="min-width: 150px; margin-left: 10px;" type="date" name="startDay" value="">
+	<label><b> -asti: </b></label>
+	<input style="min-width: 150px; margin-left: 10px;" type="date" name="endDay" value="">
+	<input id="f_name" type="hidden" name="firstname" value="<% if(data != null) { %><%= data['firstname'] %><% } %>">
+	<input id="l_name" type="hidden" name="lastname" value="<% if(data != null) { %><%= data['lastname'] %><% } %>">
+	<input style="min-width: 100px; margin-left: 10px; margin-top: -2px; background-color: #39db59; color: white; font-weight: bold;" type="submit" class="btn" value="Hae">
+</form>
+<% } %>
+
+<button onclick="HideShowVapaa(this)" style="margin-left: 30px; margin-bottom: 20px; border: none; padding-top: 5px; padding-bottom: 5px;">Näytä vapaapäivät</button>
+
+<div id="print1" class="table-responsive <% if (data == null ) { %> hidden <% } %>" style="margin-top: 10px;">
+	<table class="table">
+		<thead>
+    		<tr>
+		      <% if(data != null && data['loggin'] != null){
+					for(var i = 0; i < data['loggin'][0].length; i++){ %>
+						<th scope="col" <%if(i != 0 ){ %>style="border-left: 2px solid black;"<%}%>>
+							<% if(data['loggin'][0][i].getDay() === 1) { %>
+								<p>Maanantai</p> 
+							<% } else if(data['loggin'][0][i].getDay() === 2) { %>
+								<p>Tiistai</p>  
+							<% } else if(data['loggin'][0][i].getDay() === 3) { %>
+								<p>Keskiviikko</p>  
+							<% } else if(data['loggin'][0][i].getDay() === 4) { %>
+								<p>Torstai</p> 
+							<% } else if(data['loggin'][0][i].getDay() === 5) { %>
+								<p>Perjantai</p> 
+							<% } %>
+							<p><%=data['loggin'][0][i].getDate()+"."+(data['loggin'][0][i].getMonth()+1)+"."+data['loggin'][0][i].getFullYear()%></p>
+						</th>
+					<% } %>
+				<% } else { %> <p> data is null </p> <% } %>
+			</tr>
+		</thead>
+		<tbody>
+			<% if(data != null && data['loggin'] != null && data['loggin'].length > 1) { %>
+
+				<% console.log("DATA LOGGIN 0 : " + data['loggin'][0]) %>
+				<% for(var i = 1; i < data['loggin'].length; i++) { %>
+
+					<tr>
+						 <% var target = 0; for(var j = 0; j < data['loggin'][0].length; j++) { %>
+							<tag id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + '.' + j %>-meta" data-firstname="<%= data['loggin'][i]['firstname'] %>" data-lastname="<%= data['loggin'][i]['lastname'] %>" data-date="<%= data['loggin'][0][j] %>" />
+						 	<td id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-day" style="border-top: 3px solid black;<%if(target != 0 ){ %>border-left: 2px solid black;<%}%>">
+						 		<div id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-editor" class="hidden">
+
+							 		<input id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-edit_in" type="time" name="intime" min="07:00" max="18:00"><br>
+							 		<input id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-edit_out" type="time" name="outtime" min="07:00" max="18:00">
+							 		<div class="checkbox" style="width: 120px; position: relative; margin-top: 10px;">
+							 			<label>
+							 				Työpäivä:
+							 				<input style="margin-left: 4px;" id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-workday" type="checkbox" name="isWorkDay" <% if(data['loggin'][i]['days'][target][3] == true) { %>Checked<%}%> />
+										</label>
+							 		</div>
+							 		<button style="border: none; background-color: #39db59;  border-radius: 5px; height: 25px;" onclick="EditDone('<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] %>', <%= j %>)"><b>Valmis!</b></button>
+
+								</div>
+						 		<div style="cursor: pointer; position: relative" id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-button" onclick="ChangeUserInfo('<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] %>', <%= j %>, '<% if(data['loggin'][i]['days'][target][1]){%><%= ('0' + data['loggin'][i]['days'][target][1].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][1].getMinutes()).slice(-2) %><%}else{%><%}%>', '<% if(data['loggin'][i]['days'][target][2]){%><%= ('0' + data['loggin'][i]['days'][target][2].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][2].getMinutes()).slice(-2) %><%}else{%><%}%>')" class="<%if(data['loggin'][i]['days'][target][3] != true){%>Vapaa hidden<%}%>">
+
+						 			<% console.log("DATA: " + data['loggin'][i]['days'][target]) %>
+
+						 			<p id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-null" class="<% if((data['loggin'][i]['days'][target][1] != null|| data['loggin'][i]['days'][target][2] != null) && data['loggin'][i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data['loggin'][i]['days'][target][3] == true){%>Poissa<% }else{ %>Vapaa<% } %></p>
+
+							 		<div id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-data" style="position: relative; padding-left: 20px" class="<% if(data['loggin'][i]['days'][target][3] == false || (data['loggin'][i]['days'][target][1] == null && data['loggin'][i]['days'][target][2] == null)) { %>hidden<% } %>">
+
+							 			<% var color; var b_color;
+							 			if(data['loggin'][i]['days'][target][1] != null && data['loggin'][i]['days'][target][2] != null) { 
+								 			var f1 = data['loggin'][i]['days'][target][1]; var f2 = data['loggin'][i]['days'][target][2];
+								 			if(Is4Hours(f1, f2) == true){
+												color = "green";
+												b_color = "#83ff70";
+								 			}else{
+												color = "red";
+												b_color = "#ff7070";
+								 			}
+							 			}else if(data['loggin'][i]['days'][target][1] != null ||data['loggin'][i]['days'][target][2] != null){
+											color = "yellow";
+											b_color = "#ffff84";
+							 			}%>
+
+							 			<p id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-in">Sisään: <% if(data['loggin'][i]['days'][target][1] != null) { %><%= ("0" + data['loggin'][i]['days'][target][1].getHours()).slice(-2) + ":" + ("0" + data['loggin'][i]['days'][target][1].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+							 			<p id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-out">Ulos: <% if(data['loggin'][i]['days'][target][2] != null) { %><%= ("0" + data['loggin'][i]['days'][target][2].getHours()).slice(-2) + ":" + ("0" + data['loggin'][i]['days'][target][2].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+							 		</div>
+							 		<div id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-bubble" class="circle <%if(data['loggin'][i]['days'][target][3] == false  || (data['loggin'][i]['days'][target][1] == null && data['loggin'][i]['days'][target][2] == null)){%>hidden<%}%>" style="background-color: <%= color %>; border-color:  <%= b_color %>;"></div>
+						 		</div>		
+						 	</td>
+						 	<% target++ %> 
+						 <% } %>
+						</tr>
+
+					<% } %>
+				<% } %>
+			</tbody>
+	</table>
+</div>
+<button style="margin-left: 10px; margin-top: 10px; margin-bottom: 20px; background-color: #39db59; color: white;" class="btn <% if (data == null ) { %> hidden <% } %>" onclick="print_and_submit()"><b>Avaa taulukko uudessa ikkunassa</b></button>
+
+<% if(plugins) { %>
+	<%for(var i = 0; i < plugins.length; i++){ %>
+		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+				 <% if(hook[0] == "Modify-client") { %>
+				 	<% if(hook[1] == "TABLE_BTN") { %>
+
+				 		<%- include(hook[2])%> 
+
+				 	<%}%>
+				 <%}%>
+
+			<%}%>
+
+		<%}%>
+	<%}%>
+<% } %>
+<!-------------------->
+
+
+<div id="blocker" class="hidden" style="position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+	<div id="form-div" class="form-div" style="text-align: center; padding-left: 20px; padding-right: 20px;">
+		<p style="margin-top: 20px; font-size: 20px;"><b>Muokkaa käyttäjää</b></p>
+		<div id="form">
+			<p style="margin-top: 20px; margin-bottom: 0px;"><b>Etunimi: </b></p><input type="text" class="form-control col-12" id="wewantthis" style="margin-top: 0px;" placeholder= "Etunimi..." value="<%if(data){ %><%=data['firstname']%><%}%>">
+			<p style="margin-top: 10px; margin-bottom: 0px;"><b>Sukunimi: </b></p><input type="text" class="form-control col-12" id="wewantthis" style="margin-top: 0px;" placeholder= "Sukunimi..." value="<%if(data){ %><%=data['lastname']%><%}%>">
+			<p style="margin-top: 20px; margin-bottom: 0px;"><b>Vuoro: </b><div class="styled-select">
+
+
+
+					<select id="shift2" name="shift2">
+					<% if(shifts) { %>
+						<% for(var i = 0; i < shifts.length; i++) { %>
+							<option value="<%= shifts[i][0] %>" <% if(data['shift'] == shifts[i][0]) {%>selected<%}%>><%= shifts[i][0] %></option>
+						<%}%>
+					<%}%>
+  					</select>
+  		 	</div>
+
+  		 	<p style="margin-top: 20px; margin-bottom: 0px;"><b>Vastuuhenkilö: </b><div class="styled-select">
+
+
+
+					<select id="vastuuhenk" name="vastuu">
+					<% console.log(admins) %>
+					<% if(admins) { %>
+							<option value="ei_vast" <% if(null == vastuu) {%>selected<%}%>>Ei määritelty</option>
+						<% for(var i = 0; i < admins.length; i++) { %>
+							<option value="<%= admins[i] %>" <% if(admins[i] == vastuu) {%>selected<%}%>><%= admins[i] %></option>
+						<%}%>
+					<%}%>
+  					</select>
+  		 	</div>
+
+
+  		 	<p style="font-size: 25px; font-weight: 700; margin-top: 20px; margin-bottom: 3px;">Työpäivät:</p>
+
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Maanantai</p>
+				<input id="maanantai" type="checkbox" <% if(workDays[1] == true) { %>Checked<% } %>/>
+			</label>
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Perjantai</p>
+				<input id="perjantai" type="checkbox" <% if(workDays[5] == true) { %>Checked<% } %>/>
+			</label>
+			<br>
+
+
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Tiistai</p>
+				<input id="tiistai" type="checkbox" <% if(workDays[2] == true) { %>Checked<% } %>/>
+			</label>
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Lauantai</p>
+				<input id="lauantai" type="checkbox" <% if(workDays[6] == true) { %>Checked<% } %>/>
+			</label>
+			<br>
+
+
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Keskiviikko</p>
+				<input id="keskiviikko" type="checkbox" <% if(workDays[3] == true) { %>Checked<% } %>/>
+			</label>
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Sunnuntai</p>
+				<input id="sunnuntai" type="checkbox" <% if(workDays[0] == true) { %>Checked<% } %> />
+			</label>
+			<br>
+
+
+			<label>
+				<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Torstai</p>
+				<input id="torstai" type="checkbox" <% if(workDays[4] == true) { %>Checked<% } %>/>
+			</label>
+
+  		 	<input id="btn-submit-edit-user" type="button" style="margin-top: 30px; background-color: white; border-color: #1d9134; color: black; font-weight: 700;" class="btn btn-primary col-12" value="Tallenna">
+		</div>
+	</div>
+</div>
+ <% } %>
+
+
+
+
+
+<script type="text/javascript">
+
+var bar = document.getElementById('findbar');
+
+
+var show = false;
+
+
+function HideShowVapaa(btn){
+	var vapaat = document.getElementsByClassName('Vapaa');
+	for(var i = 0; i < vapaat.length; i++){
+		vapaat[i].classList.toggle('hidden');
+	}
+
+	if(show == false){
+		btn.innerHTML = "Piiloita vapaapäivät";
+	}else{
+		btn.innerHTML = "Näytä vapaapäivät";
+	}
+
+	show = !show;
+}
+
+function editUser(qr){
+	document.getElementById('blocker').classList.toggle('hidden', false);
+	document.getElementById('btn-submit-edit-user').onclick = function(){saveUserEdit(qr);}
+}
+
+function saveUserEdit(qr){
+
+	var inputs = document.getElementById('blocker').getElementsByTagName('input');
+	var fname = inputs[0].value;
+	var lname = inputs[1].value;
+	var shift = document.getElementById('shift2')
+	var shiftvalue = shift.options[shift.selectedIndex].value;
+	var vastuu = document.getElementById('vastuuhenk');
+	vastuu = vastuu.options[vastuu.selectedIndex].value;
+
+	var workDays = [];
+	workDays.push(document.getElementById('sunnuntai').checked);
+	workDays.push(document.getElementById('maanantai').checked);
+	workDays.push(document.getElementById('tiistai').checked);
+	workDays.push(document.getElementById('keskiviikko').checked);
+	workDays.push(document.getElementById('torstai').checked);
+	workDays.push(document.getElementById('perjantai').checked);
+	workDays.push(document.getElementById('lauantai').checked);
+
+	workDays = JSON.stringify(workDays);
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/client/mod';
+	var params='qr='+qr+'&fname='+fname+'&lname='+lname+'&shift='+shiftvalue + "&workDays="+workDays + "&vastuu="+vastuu;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	        if(request.responseText == '400'){
+	        	alert('unexpect error');
+
+	        }else{
+	        	var url = new URL(window.location.href);
+	        	var f = (fname != null && fname != "") ? fname : url.searchParams.get('firstname');
+	        	var l = (lname != null && lname != "") ? lname : url.searchParams.get('lastname');
+
+	        	window.location.href = 'http://<%=IP%>:<%=PORT%>/admin/client/info?firstname='+f+'&lastname='+l;
+	        }
+
+
+	    }
+	}
+
+	request.send(params);
+	document.getElementById('blocker').classList.toggle('hidden', true); 
+}
+
+function redirectTo(f, l){
+	location.href = 'http://<%=IP%>:<%=PORT%>/admin/client/info?firstname='+f+'&lastname='+l;
+}
+
+function print_and_submit(){
+	var myWindow = window.open("", "MsgWindow", "width=800,height=600");
+	myWindow.document.write("<html>");
+	myWindow.document.write("<link rel=stylesheet href=/styles/bootstrap.min.css>")
+	myWindow.document.write("<style type=text/css>.first{border-right: solid 2px #d6d6d6;}.hidden{display: none;visibility: none;}</style>");
+	myWindow.document.write("<body>");
+	myWindow.document.write("<div class=table-responsive>");
+	myWindow.document.write(document.getElementById("print1").innerHTML); 
+	myWindow.document.write("</div>");
+	myWindow.document.write("</body>");
+	myWindow.document.write("</html>");
+}
+
+function show_hide(btn){
+	bar.classList.toggle("hide");
+	bar.classList.toggle("show");
+	var contains = bar.classList.contains("show");
+	console.log(contains);
+	if(contains){
+		btn.innerHTML = "Piiloita haku";
+	}else{
+		btn.innerHTML = "Näytä haku";
+	}
+}
+
+function RemoveUser(){
+
+	<% if (data != null ) { %>
+	if (confirm('Oletko varma että haluat poistaa käyttäjän <%= data['name'] %>')) {
+
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/client/remove';
+		var params='code=<%=data['qr']%>';
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+	    	if(request.readyState == 4 && request.status == 200) {
+	        	window.location = "http://<%=IP%>:<%=PORT%>/admin/client/info";
+	    	}
+		}
+
+		request.send(params);    
+		
+
+	} else {
+	    // Do nothing!
+	}
+
+	<% } %>
+}
+
+function SaveData(user, day, in_r, out_r, workDay){
+
+	console.log('workDay: '+workDay);
+	var meta_name = document.getElementById(user+"."+day+"-meta");
+	var firstname = meta_name.dataset.firstname;
+	var lastname = meta_name.dataset.lastname;
+	var ddate = meta_name.dataset.date;
+	var time_in = in_r.split(':');
+	var time_out = out_r.split(':');
+	var in_d = new Date(ddate);
+
+	if(in_r != ""){
+
+		in_d.setHours(time_in[0]);
+		in_d.setMinutes(time_in[1]);
+
+	}else{
+		in_d = "";
+	}
+
+	var out_d = new Date(ddate);
+	if(out_r != ""){
+		out_d.setHours(time_out[0]);
+		out_d.setMinutes(time_out[1]);
+	}else{
+		out_d = "";
+	}
+	
+
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/client/edit';
+	var params='firstname='+firstname+"&lastname="+lastname + "&ddate="+ddate+"&din="+in_d+"&dout="+out_d+"&isWorkDay="+workDay;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+    	if(request.readyState == 4 && request.status == 200) {
+    		console.log("done");
+    		var data = document.getElementById(user+day+"-data");
+    		var nul = document.getElementById(user+day+"-null");
+    		if((workDay == true && in_d == "" && out_d == "") || workDay == false){
+    			nul.classList.toggle("hidden", false);
+    			if(in_d == "" && out_d == "" && workDay == true){
+    				nul.innerHTML = "Poissa";
+    			}else{
+    				nul.innerHTML = "Vapaa";
+    			}
+    			data.classList.toggle("hidden", true);
+    		}else{
+    			nul.classList.toggle("hidden", true);
+    			data.classList.toggle("hidden", false);
+    		}
+
+
+
+    		var bubble = document.getElementById(user+day+"-bubble");
+    		if(in_d == "" && out_d == ""){
+    			bubble.classList.toggle("hidden", true);
+    		}else if(in_d != "" && out_d != ""){
+    			bubble.classList.toggle("hidden", false);
+    			if(Is4Hours(in_d, out_d)){
+    				bubble.style.backgroundColor = "green";
+    				bubble.style.borderColor = "#83ff70";
+    			}else{
+    				bubble.style.backgroundColor = "red";
+    				bubble.style.borderColor = "#ff7070";
+    			}
+    		}else{
+    			bubble.classList.toggle("hidden", false);
+    			bubble.style.backgroundColor ="yellow";
+    			bubble.style.borderColor = "#ffff84";
+    		}
+
+    		if(workDay == false){
+    			bubble.classList.toggle("hidden", true);
+    		}
+    	}
+	}
+
+	request.send(params);
+}
+function Is4Hours(f1, f2){
+	var diff = f2.getTime() - f1.getTime();
+
+	var hours = (diff / 1000) / 3600;
+	if(hours < 4){
+		return false;
+	}else{
+		return true;
+	}
+
+}
+function ChangeUserInfo(user, day, inT, outT){
+
+	var main = document.getElementById(user+"-name");
+	var dayE = document.getElementById(user+""+day+"-day");
+	var button = document.getElementById(user + day + "-button")
+	button.classList.toggle('hidden');
+	var editor = document.getElementById(user+""+day+"-editor");
+	var inputs = editor.getElementsByTagName('input');
+
+
+
+
+	inputs[0].value = inT;
+	inputs[1].value = outT;
+	editor.classList.toggle('hidden');
+}
+
+function EditDone(user, day){
+	
+	var dayE = document.getElementById(user+""+day+"-day");
+	var button = document.getElementById(user + "" + day + "-button")
+	var editor = document.getElementById(user+""+day+"-editor");
+	var edit_in = document.getElementById(user+""+day+"-edit_in");
+	var edit_out = document.getElementById(user+""+day+"-edit_out");
+	var null_data = document.getElementById(user+""+day+"-null");
+	var data_in = document.getElementById(user+""+day+"-in");
+	var data_out = document.getElementById(user+""+day+"-out");
+	var data = document.getElementById(user+""+day+"-data");
+	var workDay = document.getElementById(user+""+day+"-workday").checked;
+
+	if( edit_in.value != "" || edit_out.value != ""){
+		null_data.classList.toggle('hidden', true);
+		data.classList.toggle('hidden', false);
+
+		if(edit_in.value != ""){
+			data_in.innerHTML = "Sisään: " + edit_in.value;
+		}else{
+			data_in.innerHTML = "Sisään: Puuttuu";
+		}
+		if(edit_out.value != ""){
+			data_out.innerHTML = "Ulos: " + edit_out.value;
+		}else{
+			data_out.innerHTML = "Ulos: Puuttuu";
+		}
+	}else{
+		data.classList.toggle('hidden', true);
+		null_data.classList.toggle('hidden', false);
+	}
+
+	button.onclick = function() { ChangeUserInfo(user,day,edit_in.value,edit_out.value); };
+
+	editor.classList.toggle('hidden');
+	button.classList.toggle('hidden');
+
+	SaveData(user, day, edit_in.value, edit_out.value, workDay);
+}
+
+</script>
+
+<% include ./scripts/print.html %>
+
+<% if(plugins) { %>
+	<%for(var i = 0; i < plugins.length; i++){ %>
+	 	<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+	 		<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+	 			<% if(hook[0] == "Modify-client") { %>
+	 					<% if(hook[1] == "END") { %> 
+	 						<%- include(hook[2])%> 
+	 					<% } %>
+	 			<%	} %>
+	 		<% } %>
+	 	<% } %>
+	<%	} %>
+<% } %>

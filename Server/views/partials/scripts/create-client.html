@@ -1,0 +1,114 @@
+<script type="text/javascript">
+	
+
+var firstname = document.getElementById("firstname");
+var lastname = document.getElementById("lastname");
+var unit = document.getElementById("unit");
+var shift = document.getElementById("shift2");
+var p_name = document.getElementById("p_name");
+var p_unit = document.getElementById("p_unit");
+var p_shift = document.getElementById("p_shift");
+
+function UppercaseFirst(string){
+
+	if(string != null && string != undefined && string.length > 0)
+		return string.charAt(0).toUpperCase() + string.slice(1);
+
+	return string;
+
+}
+
+function showPrint(){
+	
+		p_name.innerHTML = UppercaseFirst(firstname.value) + " " + UppercaseFirst(lastname.value);
+		p_unit.innerHTML = UppercaseFirst(unit.value);
+		p_shift.innerHTML = shift.options[shift.selectedIndex].value;
+};
+
+function submit(callback){
+
+	var firstname = document.getElementById('firstname');
+	var lastname = document.getElementById('lastname');
+	var unit = document.getElementById('unit');
+	var shift = document.getElementById('shift2');
+	var hidden_qr = document.getElementById('hidden_qr');
+	var message = document.getElementById('success');
+	message.classList.toggle('hidden', false);
+
+	if(firstname.value == "" || lastname.value == "" || unit.value == "" || shift.options[shift.selectedIndex].value == "" || hidden_qr.value == ""){
+		message.classList.toggle('hidden', true);
+		var message2 = document.getElementById('failed');
+		message2.classList.toggle('hidden', false);
+		message2.innerHTML = "Täytä kaikki kentät ennen lähettämistä";
+		return false;
+	}else{
+		var message = document.getElementById('failed');
+		message.classList.toggle('hidden', true);
+	}
+
+	var workDays = [];
+	workDays.push(document.getElementById('sunnuntai').checked);
+	workDays.push(document.getElementById('maanantai').checked);
+	workDays.push(document.getElementById('tiistai').checked);
+	workDays.push(document.getElementById('keskiviikko').checked);
+	workDays.push(document.getElementById('torstai').checked);
+	workDays.push(document.getElementById('perjantai').checked);
+	workDays.push(document.getElementById('lauantai').checked);
+
+	workDays = JSON.stringify(workDays);
+
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/create';
+	var params='firstname='+firstname.value+"&lastname="+lastname.value + "&unit="+unit.value+"&shift="+shift.options[shift.selectedIndex].value+"&_id="+hidden_qr.value+"&workDays="+workDays;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+    	if(request.readyState == 4 && request.status == 200) {
+        	var response = JSON.parse(request.responseText);
+        	if(response[0] == "ok"){
+        		var message = document.getElementById('success');
+				message.classList.toggle('hidden', true);
+				message.innerHTML = "Uusi kävijätieto luotu onnistuneesti";
+				var image = document.getElementById('qr_image');
+				callback(true);
+				image.src = "https://chart.googleapis.com/chart?cht=qr&chl="+response[1]+"&chs=160x160&chld=L|0";
+				image.alt = response[1];
+				hidden_qr.value = response[1];
+        	}else{
+        		var message = document.getElementById('failed');
+				message.classList.toggle('hidden', false);
+				message.innerHTML = response[1];
+				callback(false);
+        	}
+    	}
+	}
+
+	request.send(params);
+}
+
+var res = function(boolean){
+	
+	if(boolean){
+		print();
+		var firstname = document.getElementById('firstname');
+		var lastname = document.getElementById('lastname');
+		firstname.value = "";
+		lastname.value = "";
+		showPrint();
+	}else{
+		alert('Kävijätiedon luominen epäonnistui');
+		console.log("failed");
+	}
+}
+
+function print_and_submit(){
+	submit(res);
+	
+}
+
+
+
+
+</script>

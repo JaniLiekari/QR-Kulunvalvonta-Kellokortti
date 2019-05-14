@@ -1,0 +1,1126 @@
+
+
+<style>
+
+	.leftside{
+		width: 15%;
+		background-color: #39db59;
+		float: left;
+		height: 100%;
+		display: inline-block;
+		position: relative;
+
+
+	}
+
+	.leftside:before{
+		content: "";
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		-moz-box-shadow:    inset 0 0 10px 1px #000000;
+	   -webkit-box-shadow: inset 0 0 10px 1px #000000;
+	   box-shadow:         inset 0 0 10px 1px #000000;
+		z-index: 0;
+	}
+
+	.side-header{
+		
+		text-align: center;
+		padding-top: 30px;
+		padding-bottom: 30px;
+		width: 100%;
+
+	}
+	.side-header p{
+		font-size: 30px;
+		color: white;
+		text-shadow: 0 0 5px black;
+		font-weight: 700;
+		margin-bottom: 0;
+	}
+
+	.side-content p{
+		font-size: 18px;
+		position: relative;
+		margin-left: 40px;
+		font-weight: 700;
+		color: white;
+		text-shadow: 0 0 5px black;
+		transition-duration: 100ms;
+	}
+	.side-content p:not(.active){
+		cursor: pointer;
+	}
+
+	.side-content .active{
+		color: yellow;
+	}
+
+	.side-content p:after{
+		content: "";
+		display: block;
+		width: 5px;
+		height: 5px;
+		background-color: white;
+		position: absolute;
+		left: -15px;
+
+		box-shadow: 0 0 5px 1px black;
+		border-radius: 50%;
+		top: 50%;
+		transform: translate(0, -50%);
+	}
+	.side-content p:not(.active):hover{
+		color: gray;
+		font-size: 20px;
+	}
+
+
+	.hidden{
+		visibility: hidden;
+		display: none;
+	}
+
+
+	.shiftButton{
+		background-color: #39db59;
+		border-radius: 10px;
+		width: 200px;
+		height: 40px;
+		color: #3f3f3f;
+		transition-duration: 250ms;
+		cursor: pointer;
+		box-shadow: 0 0 0 black;
+	}
+	.shiftButton:hover{
+		background-color: #faffaf; 
+		border-radius: 20px;
+		box-shadow: 0 0 5px black;
+	}
+	#button_thing{
+		margin-left: 10px; 
+		margin-right: 10px; 
+		background-color: white; 
+		border-radius: 10px; 
+		width: 200px; 
+		height: 40px; 
+		color: #3f3f3f;  
+		display: inline-block; 
+		text-align: center;
+		transition-duration: 250ms;
+		cursor: pointer;
+	}
+	#button_thing:hover{
+		
+		background-color: #faffaf; 
+		border-radius: 20px;
+	}
+
+	.form-div{
+
+		width: 500px;
+		background-color: white;
+		border-radius: 10px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	body{
+		height: 100%;
+		overflow-y: hidden;
+	}
+
+	.form-settings{
+		width: 600px;
+		height: 400px;
+		background-color: white;
+		border-radius: 10px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+
+	.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color:  #39db59;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+
+
+.radio:checked{
+	background-color: green;
+}
+
+
+.downloadlink{
+	text-decoration: none;
+	color: #39db59;
+	font-weight: 700;
+	font-size: 20px;
+	transition-duration: 100ms;
+	display: block;
+}
+.downloadlink:hover{
+	color: #5792f2;
+	font-size: 22px;
+}
+
+.backup-b{
+	display: inline-block; width: 130px;
+	border: none;
+	border-radius: 15px;
+	box-shadow: 0 0 4px 1px black;
+}
+.backup-b p{
+	margin-bottom: 0; font-size: 18px; color: white;
+
+}	
+
+.plg:before{
+
+	content: "";
+	width: 0%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	height: 35px;
+	border-radius: 5px;
+	background-color: rgb(63, 194, 255);
+	transition-duration: 700ms;
+}
+
+.plg:hover:before{
+	width: 80%;
+}
+
+.plg-cont:after{
+	content: "";
+	width: 500px;
+	height: 1px;
+	position: absolute;
+	left: 50%; transform: translate(-50%, 0);
+	background-color: black;
+	bottom: -25px;
+}
+
+
+</style>
+
+<div id="wrapper" class="wrapper" style="position: relative;">
+
+
+	<div id="left-side" class="leftside">
+
+		<div class="side-header">
+			<p>Asetukset</p>
+		</div>
+
+
+		<div class="side-content">
+			<p id="001" class="active" onclick="showHide('hid_allowRegister', this, '001');">Yleistä</p>
+			<p id="002" onclick="showHide('vuorot', this, '002');">Vuorot</p>
+			<p id="003" onclick="showHide('etusivu', this, '003');">Ulkoasu asetukset</p>
+			<p id="004" onclick="showHide('ACCOUNT_MANAGEMENT', this, '004');">Käyttäjien Hallinta</p>
+			<p id="006" onclick="showHide('Plugins', this, '006');">Plug & Play</p>
+			<p id="005" onclick="showHide('documents', this, '005');">Dokumentit</p>
+		</div>
+
+	</div>
+
+	<div style="width: 85%; height: 100%; display: inline-block; z-index: 666;">
+		
+
+		<div id="hid_allowRegister" class="checkbox" style="font-size: 25px; text-align: center;" class=>
+			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Rekisteröinti</p>
+				<p style="margin-bottom: 2px"><b>-Salli rekisteröinti:</b> Rekisteröinnin ollessa sallittu kirjautumis-sivulla näkyy "Rekisteröi" nappi.</p> 
+				<p style="margin-bottom: 35px"><b>-Kytkin:</b> Kytkimen ollessa vihreä rekisteröinti on sallittu. Harmaana rekisteröinti on poissa käytössä.</p> 
+			</div>
+
+			<label class="switch">
+				<input id="checkBox" type="checkbox" onchange="sendData();" <% if(reg === true) { %> Checked <% } %> >
+				<span class="slider round"></span>
+			</label>
+
+			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Backup</p>
+				<p style="margin-bottom: 2px"><b>-Lataa:</b> Tekee kopion tietokannasta (vain kävijätiedot ja vuorot kopioidaan).</p> 
+				<p style="margin-bottom: 35px"><b>-Lähetä:</b> Korvaa nykyisentietokannan ladatulla backupilla.</p> 
+			</div>
+
+			<div style="position: relative; width: 100%; height: 40px;">
+				<div style="position: absolute; width: 300px; left: 50%; height: 50%; transform: translate(-50%, -50%);">
+					<button class="backup-b" style="background-color: #39db59; float: left;" onclick="downloadBackup();"><p>Lataa</p></button>
+					<button class="backup-b" style="background-color: #4286f4; float: right;" onclick="OpenFileDialog();"><p>Lähetä</p></button>
+				</div>
+
+				<input type="file" id="backup-file" accept=".backup" name="backup" onchange="UploadFile();" style="display: none; visibility: hidden;">
+
+			</div>
+
+
+			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Reset</p>
+				<p style="margin-bottom: 2px"><b>-Reset:</b> Resetoi koko tietokannan ja palauttaa sen "tehdasasetuksille".</p> 
+				<p style="margin-bottom: 2px"><b>HUOM! OTA VARMUUSKOPIO ENNEN RESETOINTIA</b></p>
+				<p style="margin-bottom: 35px"><b>KAIKKI TIEDOT POISTETAAN</b></p> 
+			</div>
+
+			<div style="position: relative; width: 100%; height: 40px;">
+				<div style="position: absolute; width: 140px; left: 50%; height: 50%; transform: translate(-50%, -50%);">
+					<button class="backup-b" style="background-color: #a8153f;" onclick="ResetServer();"><p>Resetoi</p></button>
+				</div>
+			</div>
+
+
+	</div>	
+
+
+
+
+
+
+		<div id="vuorot" class="hidden" style="padding-left: 150px; padding-right: 150px; text-align: center;">
+
+			<div style="width: 100%; padding-top: 20px; text-align: center;">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Vuorojen hallinta</p>
+				<p style="margin-bottom: 2px;"><b>-Luo uusi vuoro:</b> Paina "Uusi vuoro++" nappia. Aseta avautuneeseen ikkunaan vuoron nimi ja vuorossa olevien tavoite aika. Klikkaa "Tallenna uusi".</p> 
+				<p style="margin-bottom: 2px;"><b>-Päivitä vuoroa:</b> Paina vuoroa jota haluat muokata. Avautuneessa ikkunassa muokkaa vuoron nimeä tai tavoite aika. Klikkaa "Tallenna muutokset" tai "Poista".</p> 
+				<p style="margin-bottom: 35px;"><b>-Järjestä vuorot:</b> Paina jotain vuoroa pohjassa hiiren ensimmäisellä. Pidä hiiri pohjassa ja vedä vuoro joko edeltävän tai jäljessä olevan vuoron kohdalle. Päästä hiirestä kohdassa johon haluat vuoron siirtää.</p> 
+			</div>
+
+			<% if(shifts) { %>
+				<% for(var i = 0; i < shifts.length; i++){ %>
+					<tag id="<%= shifts[i][0] + i %>-meta" data-name="<%= shifts[i][0] %>" data-hours="<%=shifts[i][1]%>" data-minutes="<%=shifts[i][2]%>"></tag>
+					<div id='<%= shifts[i][0] + i %>' draggable="true" class="drag-me" style="margin-top: 5px; display: inline-block; margin-left: 10px; margin-right: 10px; text-align: center; cursor: default; position: relative;">
+						<div class="shiftButton" onclick="CreateNewShift(document.getElementById('button_thing'),'<%= shifts[i][0] %>', '<%=shifts[i][0] + i %>', '<%=shifts[i][1]%>','<%=shifts[i][2]%>')">
+							<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);  white-space: nowrap; font-weight: 700"><%= shifts[i][0] %></p>
+						</div>
+					</div>	
+				<%}%>
+			<%}%>
+
+			<div id="button_thing" onclick="CreateNewShift(this);">
+				<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>Uusi vuoro++</b></p>
+			</div>
+
+		</div>
+
+
+
+
+
+
+		<div id="etusivu" class="hidden" style="padding-left: 150px; padding-right: 150px; text-align: center;">
+
+			<div style="width: 100%; padding-top: 20px; text-align: center;">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Ulkoasun asetukset</p>
+				<p style="margin-bottom: 2px;"><b>-Nimien näyttäminen:</b> Nimien näyttäminen määrittää kuinka nimet näkyvät ja miten ne on järjestelty etusivulla. Alla tarkennukset.</p>
+				<div style="text-align: left; padding-left: 250px;">
+				<p style="margin-bottom: 2px;">		<b>1. </b>Mikko M. Näyttää koko etunimen ja sukunimen ensimmäisen kirjaimen. Järjestetään etunimestä aakkosittain.</p> 
+				<p style="margin-bottom: 2px;">		<b>2. </b>Mallikas M. Näyttää koko sukunimen ja etunimen ensimmäisen kirjaimen. Järjestetään sukunimestä aakkosittain.</p> 
+				<p style="margin-bottom: 35px;">		<b>3. </b>Mikko Mallikas. Näyttää koko etunimen ja sukunimen. Järjestetään etunimestä aakkosittain.</p> </div>
+			</div>
+
+			<div>
+
+				<p style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Nimen näyttäminen: </p>
+
+				<label class="radio-inline" style="font-size: 17px; font-weight: 700;"><input type="radio" class="radio" name="optradio" onchange="ChangeFirstPageOptions('Mikko M.')" <% if(MainPageSetting == 'Mikko M.'){ %> checked <% } %>>Mikko M.</label>
+				<label class="radio-inline" style="margin-left: 30px; font-size: 17px; font-weight: 700;"><input type="radio" class="radio" name="optradio" onchange="ChangeFirstPageOptions('Mallikas M.')" <% if(MainPageSetting == 'Mallikas M.'){ %> checked <% } %>>Mallikas M.</label>
+				<label class="radio-inline" style="margin-left: 30px; font-size: 17px; font-weight: 700;"><input type="radio" class="radio" name="optradio" onchange="ChangeFirstPageOptions('Mikko Mallikas')" <% if(MainPageSetting == 'Mikko Mallikas'){ %> checked <% } %>>Mikko Mallikas</label>
+
+			</div>
+
+		</div>
+
+		<div id="Plugins" class="hidden" style="padding-left: 150px; padding-right: 150px; text-align: center;">
+
+			<div style="width: 100%; padding-top: 20px; text-align: center;">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Plug & Play</p>
+				<p style="margin-bottom: 2px;">Alle listattuna ominaisuudet jotka tukevat Plug & Play toimintoa.</p> 
+				<p style="margin-bottom: 2px;">Klikkaamalla ominaisuutta voit joko laittaa ominaisuuden käyttöön tai ottaa sen pois käytöstä</p> 
+				<p style="margin-bottom: 2px;">Vihreä merkki ominaisuuden nimen vieressä kertoo ominaisuuden olevan käytössä kun taas punainen kertoo ominaisuuden olevan poissa käytöstä!</p> 
+				<p style="margin-bottom: 2px;">Lopuksi painamalla "<b>Käynnistä uudelleen</b>" nappia serveri hyväksyy muutokset ja käynnistää itsensä uudelleen.</p>
+				<p style="margin-bottom: 35px;"><b>Päivitä ikkuna uudelleen käynnistämisen jälkeen!</b></p> 
+			</div>
+
+			<% if(plugins) { %>
+				<% for(var i = 0; i < plugins.length; i++){ %>
+					<div id="plugin-<%=plugins[i].Name%>-btn" class="plg" style="position: relative; cursor: pointer; width: 400px; height: 20px; left: 50%; transform: translate(-50%, 0);" onclick="ChangePluginState('<%= plugins[i].Name %>',<%= plugins[i].Temp[0]%>);"> 
+						<% var usecolor = (plugins[i].Temp[0] == true) ? "#16bc00" : "#bc0035" %>
+						<% console.log("use: " + plugins[i].Temp[0]); %>
+						<div id="plugin-<%=plugins[i].Name%>" style="position: absolute; left: -20px; width: 20px; height: 20px; top: 50%; transform: translate(0, -50%); border-radius: 50%; background-color: <%= usecolor %>;"></div>
+						<p style="position: relative; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700;"><%= plugins[i].Name %></p> 
+					</div>
+					<div class="plg-cont" style="position: relative; cursor: pointer; width: 500px; left: 50%; transform: translate(-50%, 0); margin-top: 10px; margin-bottom: 60px;">
+						<p style="font-size: 16px; margin-bottom: 0px;"><%= plugins[i].Description %></p>
+						<p style="font-size: 14px; font-style: italic; margin-bottom: 0px;">V. <%=plugins[i].Versio %></p>
+					</div>
+				<%}%>
+			<%}%>
+
+
+			<button style="color: white; background-color: #39db59; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 20px; margin-top: 5px; padding: 5px 25px 5px 25px; text-shadow: 0 0 4px black;" onclick="Reset();">Käynnistä uudelleen!</button>
+
+		</div>
+
+
+		<div id="documents" class="hidden" style="padding-left: 150px; padding-right: 150px; text-align: center;">
+
+			<div style="width: 100%; padding-top: 20px; text-align: center;">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Dokumentit</p>
+				<p style="margin-bottom: 2px;">Kaikki dokumentit eivät välttämättä ole kokonaan ajantasalla.</p>
+				<p style="margin-bottom: 50px;">Tältä sivulta voit ladata dokumentteja sovellukseen liittyen.</p>
+			</div>
+
+			<div>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/helppo_asennus.pdf" download>Helppo asennus</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/Kayttoohjeet.pdf" download>Ohjeet ohjelman käyttöön</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/flowchart.pdf" download>Flowchart</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/PLUGINS.pdf" download>Pluginsien teko ja käyttö</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/QRCODE_OMI.pdf" download>QR-Koodi lukijan ominaisuudet</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/polut_modelit_ja_muuta.pdf" download>Polut, Modelit yms.</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/Troubles.pdf" download>Ongelmat</a>
+			</div>
+
+		</div>
+
+
+
+		<div id="ACCOUNT_MANAGEMENT" class="hidden" style="width: 100%; margin-top: 10px; padding-top: 10px; padding-bottom: 30px; ">
+			<div style="position: relative; text-align: center">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Käyttäjien hallinta</p>
+				<p style="margin-bottom: 2px;"><b>-Käyttäjien hallinnassa:</b> Voit muokata admin käyttäjien oikeuksia, poistaa admin käyttäjätunnuksia ja seurata adminkäyttäjien loki tietoja.</p>
+				<p style="margin-bottom: 2px;"><b>-Sininen:</b> (Asetukset) Voit asettaa adminille oikeuksia ja vaihtaa salasanan.</p>
+				<p style="margin-bottom: 2px;"><b>-Vihreä:</b> (Loki) Lataa adminin lokitiedot luettavaksi.</p>
+				<p style="margin-bottom: 35px;"><b>-Sininen:</b> (Punainen) Poistaa adminin tunnukset.</p>
+			</div>
+			<div id="hid_accountManagement" style="height: 700px; position: relative;">
+					<div id="account-select" style="position: absolute; overflow-y: auto; height: 500px;  padding-left: 225px; padding-right: 225px;  width: 80%;  left: 50%; transform: translate(-50%, 0); padding-top: 10px; margin-bottom: 10px; text-align: center;">
+						<% if(accounts) { %>
+							<% for(var i = 0; i < accounts.length; i++){ %>
+
+								<div class="account block" style="margin-bottom: 15px; position: relative; padding-top: 5px; width: 100%; height: 70px; position: relative; color: black; background-color: #ffffff; border-bottom: 1px solid black;"  onclick="">
+									<div class="row" style="margin: 0">
+										<div class="col-sm" style="height: 70px; padding: 0;">
+											<p style="position: absolute; left: 0; top: 50%; transform: translate(0,-50%); font-size: 23px; height: 30px;"><%= accounts[i] %></p>
+										</div>
+										<div class="col-md" style="height: 70px;">
+											<p style="position: absolute; left: 50%; top: 50%; transform: translate(-100%,-50%);">Viimeksi kirjautunut: 22.11.2018</p>
+										</div>
+										<div class="col-sm" style="height: 70px;">
+											<%if(privileges[5] === true) {%><div style="position: absolute; right: 195px; top: 50%; text-align: center; color:white; transform: translate(-50%, -50%); width: 60px; height: 50px; border-radius: 5px; background-color: #2289f7; cursor: pointer;" onclick="Edit_account('<%= accounts[i] %>');">
+												<img src="././img/settings.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+												
+											</div><% } %>
+											<div style="position: absolute; right: 100px; text-align: center; color:white; top: 50%; transform: translate(-50%, -50%); width: 60px; height: 50px; cursor: pointer; border-radius: 5px; background-color: #39db59" onclick="loadLog('<%= accounts[i] %>');" >
+												<img src="././img/log.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+
+											</div>
+											<%if(privileges[6] === true) {%><div style="position: absolute; right: 5px; top: 50%; text-align: center; color:white; cursor: pointer; transform: translate(-50%, -50%); width:60px; height: 50px; border-radius: 5px; background-color: #ce2727" onclick="removeAccount('<%= accounts[i] %>', this);" >
+												<img src="././img/trash.png" width="35px" height="35px" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+											</div><% } %>
+										</div>
+									</div>
+								</div>
+
+							<% } %>
+
+						<% } %>
+					</div>
+			</div>
+		</div>
+
+
+
+	</div>
+
+</div>
+
+
+
+
+
+<div id="blocker" class="hidden" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+	<div id="form-div" class="form-div" style="text-align: center; padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
+		<p id="block-head" style="margin-top: 20px; font-size: 20px;"><b>LUO UUSI VUORO</b></p>
+		<div id="form" style="text-align: left;">
+			<input type="text" class="form-control col-12" id="wewantthis" style="margin-top: 20px;" placeholder= "Vuoron nimi..." value="">
+			<label >
+				Tavoite aika: 
+				<input type="time" id="rqTime" style="margin-top: 20px;">
+			</label>
+			<input id="btn-submit" type="button" style="margin-top: 10px; background-color: white; border-color: #1d9134; color: black; font-weight: 700;" class="btn btn-primary col-12" value="Tallenna" onclick="SendNewShift();">
+			<input id="btn-remove" type="button" style="margin-top: 10px; background-color: white; border-color: #1d9134; color: black; font-weight: 700;" class="btn btn-primary col-12 hidden" value="Poista" onclick="RemoveShift()">
+		</div>
+		<div style="display: block; position: absolute; right: 0; top: 25px; width: 20px; height: 20px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: red; color: white;" onclick="hide();">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>X</b></p>
+		</div>
+	</div>
+</div>
+
+<div id='copy' class="hidden" style="margin-top: 10px; display: inline-block; margin-left: 10px; margin-right: 10px; text-align: center; position: relative;">
+	<div class="shiftButton" style="">
+		<p style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);  white-space: nowrap;"><b></b></p>
+	</div>
+</div>
+
+<div id="settings-block" class="hidden" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+	<div id="form-settings" class="form-settings" style="text-align: center; padding-left: 20px; padding-right: 20px;">
+		<p style="margin-top: 20px; font-size: 20px; font-weight: 700;"></p>
+		<div style="text-align: left;">
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kirjautumistietojen muokkaus</b>
+				</label>
+			</div>
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli uuden kävijän luominen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kävijän poistaminen järjestelmästä</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli kävijän tietojen muokkaaminen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli vuorojen muokkaaminen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli hallitsijoiden muokkaaminen/luominen</b>
+				</label>
+			</div>	
+			<div style="font-size: 15px;" class="checkbox">
+				<label>
+				    <input type="checkbox"/>
+				   	<b>Salli hallitsijoiden poistaminen</b>
+				</label>
+			</div>
+			<div style="font-size: 15px;">
+				<label>
+				   	<b>Uusi salasana</b>
+				   	 <input id="newpassword" type="text"/>
+				   	 <button id="passwordChange" class="btn btn-primary" onclick="changePassword();">Korvaa vanha salasana</button>
+				</label>
+			</div>
+		</div>
+		<div style="display: block; position: absolute; right: 0; top: 25px; width: 20px; height: 20px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: red; color: white;" onclick="closeEdit_account();">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>X</b></p>
+		</div>
+		<div id="save_account_settings" style="display: block; position: absolute; left: 50%; bottom: 0; width: 120px; height: 40px; box-shadow: 1px 1px 10px black; border-radius: 5px; transform: translate(-50%, -50%); background-color: green; color: white;">
+			<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><b>Tallenna</b></p>
+		</div>
+	</div>
+</div> 
+
+
+
+<script type="text/javascript">
+
+function Reset(){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/reset';
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.send();
+}
+
+
+function SavePluginState(name, state){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/pluginsSave';
+	var params="name="+name + "&state="+state;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert('Asetus vaihdettu muotoon: '+name +" = " + state);
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+
+function ChangePluginState(plug, use){
+
+	use = !use;
+
+	SavePluginState(plug, use);
+
+	if(use == true){
+
+		document.getElementById('plugin-'+plug).style.backgroundColor = "#16bc00";
+
+	}else{
+		document.getElementById('plugin-'+plug).style.backgroundColor = "#bc0035";
+	}
+
+	document.getElementById('plugin-'+plug+'-btn').onclick = function(){
+
+		ChangePluginState(plug, use);
+
+	};
+}
+
+function FixWrapper(){
+
+	var wrapper = document.getElementById("wrapper");
+	var nav = document.getElementById("nav-bar");
+
+	var height = window.innerHeight - nav.offsetHeight;
+
+	wrapper.style.height = height+"px";
+
+
+}
+
+document.onload = FixWrapper();
+
+
+function OpenFileDialog(){
+
+	console.log("JEP");
+
+	var file_d = document.getElementById('backup-file');
+	file_d.click();
+}
+
+function ResetServer(){
+		if (confirm('KOKO TIETOKANTA TYHJENNETÄÄN. OLETHAN OTTANUT VARMUUSKOPION ENNEN JATKAMISTA.')) {
+			window.location = 'http://<%=IP%>:<%=PORT%>/admin/backup/reset';
+			
+		}
+}
+
+function UploadFile(){
+
+	console.log("JEP");
+	if (confirm('Tarkista että tiedosto ' + document.getElementById('backup-file').value + ' on VARMASTI oikea. \n\r KAIKKI ALKUPERÄISET TIEDOT POISTETAAN! \n\r VALITSE *PERUUTA* ELLET OLE OTTANUT NYKYISESTÄ TIETOKANNASTA VARMUUSKOPIOTA!')) {
+		var file_d = document.getElementById('backup-file');
+		if(file_d.files.length != 0){
+			var formData = new FormData();
+			var file = file_d.files[0];
+			formData.append("backup", file);
+
+			var request =  new XMLHttpRequest();
+			var url = 'http://<%=IP%>:<%=PORT%>/admin/backup/upload';
+
+			request.open("POST", url,true);
+			//request.setRequestHeader('Content-type', 'multipart/form-data');  /* MULTER EI TYKKÄÄ JOS Content-type ASETETAAN MANUAALISESTI */
+
+			request.onreadystatechange = function() {
+			    if(request.readyState == 4 && request.status == 200) {
+			    	if(request.responseText != 'ok'){
+			    		alert('ERROR: '+ request.responseText);
+			    	}else{
+			    		alert('Backup lähetetty!');
+			    	}
+			    }
+
+			}
+			request.send(formData);
+		}
+	}
+
+}
+
+function downloadBackup(){
+	window.location = "http://<%=IP%>:<%=PORT%>/admin/backup/download";
+}
+
+
+function ChangeFirstPageOptions(name){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/firstpagename';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert('Asetus vaihdettu muotoon: '+name);
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+
+var dragobject = null;
+
+function dragstart(e){
+	dragobject = this;
+}
+
+function dragover(e) {
+  e.preventDefault()
+}
+function dragenter(e) {
+  e.preventDefault()
+}
+function drop() {
+	if(dragobject != null){
+		if(this == dragobject){
+			return;
+		}
+		var dragobjs = document.getElementsByClassName('drag-me');
+
+		var x = 0;
+		var y = 0;
+
+		for(var i = 0; i < dragobjs.length; i++){
+			if(dragobjs[i] == dragobject){
+				x = i;
+			}
+		}
+		for(var i= 0; i < dragobjs.length; i++){
+			if(dragobjs[i] == this){
+				y = i;
+			}
+		}
+
+		var clone = dragobject.cloneNode(true);
+		var parent = dragobject.parentNode;
+		parent.removeChild(dragobject);
+
+		if(x > y){
+			parent.insertBefore(clone,this);
+		}else{
+			if(y >= (dragobjs.length-1)){
+				parent.insertBefore(clone, document.getElementById('button_thing'));
+			}else{
+				parent.insertBefore(clone, dragobjs[y + 1]);
+			}
+		}
+
+		clone.addEventListener("dragstart", dragstart)
+		clone.addEventListener("dragover", dragover)
+		clone.addEventListener("dragenter", dragenter)
+		clone.addEventListener("drop", drop)
+
+		changeOrderOf();
+
+	}
+}
+
+
+function changeOrderOf(){
+	var objs = document.getElementsByClassName('drag-me');
+	var data = [];
+	for(var i= 0; i < objs.length; i++){
+		var temp = [];
+		var meta = document.getElementById(objs[i].id + "-meta");
+		temp.push(meta.dataset.name);
+		temp.push(meta.dataset.hours);
+		temp.push(meta.dataset.minutes);
+
+		data.push(temp);
+	}
+
+	data = JSON.stringify(data);
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/order';
+	var params="order="+data;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		console.log("ok");
+	    	}
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function createDrag(){
+	var dragElements = document.getElementsByClassName("drag-me");
+	for(var i = 0; i < dragElements.length; i++){
+		dragElements[i].addEventListener("dragstart", dragstart)
+		dragElements[i].addEventListener("dragover", dragover)
+		dragElements[i].addEventListener("dragenter", dragenter)
+		dragElements[i].addEventListener("drop", drop)
+	}
+}
+
+createDrag();
+
+function removeAccount(name, object){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/remove';
+	var params="account="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		var del = object.parentNode.parentNode.parentNode;
+	    		del.parentNode.removeChild(del);
+
+	    		if(request.responseText == 'logout'){
+	    			window.location.href = 'http://<%=IP%>:<%=PORT%>/admin';
+	    		}
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+var last = 'hid_allowRegister';
+var lastb = '001';
+function showHide(id, selector, nb){
+	var ele = document.getElementById(id);
+	var l = document.getElementById(last);
+	var lb = document.getElementById(lastb);
+	var nnb = document.getElementById(nb);
+	lastb = nb;
+	last = id;
+	if(!selector.classList.contains('active')){
+
+		lb.classList.toggle('active', false);
+		nnb.classList.toggle('active', true);
+		l.classList.toggle('hidden', true);
+		ele.classList.toggle('hidden', false);
+	}
+}
+
+function changePassword(name){
+
+	var newpassword = document.getElementById('newpassword').value;
+	if(newpassword == null ||newpassword == undefined || newpassword.left < 1){
+		alert('Tarkista uusi salasana');
+		return;
+	}
+
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/edit_password';
+	var params="username="+name+"&password="+newpassword;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert('password changed to '+ newpassword);
+	    		document.getElementById('newpassword').value = "";
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+function hide(){
+	document.getElementById("blocker").classList.toggle("hidden", true);
+}
+function closeEdit_account(){
+	var settings_block = document.getElementById('settings-block');
+	settings_block.classList.toggle('hidden', true);
+}
+
+function saveEdit_account(name){
+	var settings_block = document.getElementById('settings-block');
+	settings_block.classList.toggle('hidden', true);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/edit';
+	var privileges = [];
+	var inputs = document.getElementById('form-settings').getElementsByTagName('input');
+	for(var i = 0; i < inputs.length; i++){
+		privileges.push(inputs[i].checked);
+	}
+	console.log(privileges);
+	var params="name="+name+"&privileges="+JSON.stringify(privileges);
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		alert(request.responseText);
+	    	}
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function Edit_account(name){
+
+	console.log('name: ' + name);
+	document.getElementById('passwordChange').onclick = function() {changePassword(name)};
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/account/privileges';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	if(request.responseText == '400'){
+	    		alert('not allowed');
+	    	}else{
+	    		var response = JSON.parse(request.responseText);
+	    		var settings_block = document.getElementById('settings-block');
+				document.getElementById('form-settings').getElementsByTagName('p')[0].innerHTML = 'Muokkaa '+name + ' käyttäjää';
+				var inputs = document.getElementById('form-settings').getElementsByTagName('input');
+
+				for(var i = 0; i < inputs.length; i++){
+					inputs[i].checked = (response[i] == 'true' || response[i] == true) ? true : false;
+				}
+
+				var save_btn = document.getElementById('save_account_settings');
+				save_btn.onclick = function(){saveEdit_account(name);};
+				settings_block.classList.toggle('hidden', false);
+	    	}
+	    }
+	}
+
+	request.send(params);
+}
+
+function sendData(){
+
+	var checkBox = document.getElementById("checkBox").checked == true ? true : false;
+	console.log(checkBox);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/register';
+	var params="allowed="+checkBox;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	alert("settings saved");
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function loadLog(name){
+
+	alert('loading log ' + name + '.txt');
+	window.location = "http://<%=IP%>:<%=PORT%>/admin/load/log?from="+name;
+}
+
+function RemoveShift(name, id){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/remove';
+	var params="name="+name;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	var element = document.getElementById(id);
+	    	element.parentNode.removeChild(element);
+
+	    	hide();
+
+	    }
+	}
+
+	request.send(params);
+}
+function EditShift(n,i){
+	var name = document.getElementById('wewantthis').value;
+	var rqtime = document.getElementById('rqTime').value;
+	if(rqtime == null || rqtime == undefined || rqtime == ""){
+		alert('Tavoite aika asetettava!');
+		return;
+	}
+	if(name != null && name != undefined && name.length > 0 && rqtime != null && rqtime != undefined && rqtime != ""){
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/edit';
+		var params="name="+name+"&rqTime="+rqtime+"&org="+n;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+		    if(request.readyState == 4 && request.status == 200) {
+		    	document.getElementById(i).getElementsByTagName("p")[0].innerHTML = name;
+		    	var h = rqtime.split(":")[0];
+		    	var m = rqtime.split(":")[1];
+		    	document.getElementById(i).getElementsByTagName("div")[0].onclick = function(){CreateNewShift(document.getElementById('button_thing'),name, name + i[i.length - 1], h,m)}
+		    	document.getElementById(i).id = name + i[i.length - 1];
+		    	var meta = document.getElementById(i+"-meta");
+		    	meta.dataset.hours = h;
+		    	meta.dataset.minutes = m;
+		    	hide();
+		    }
+		}
+
+		request.send(params);
+	}
+}
+function SendNewShift(){
+
+	var name = document.getElementById('wewantthis').value;
+	var rqtime = document.getElementById('rqTime').value;
+	console.log('value: ' + name);
+	if(name != null && name != undefined && name.length > 0 && rqtime != null && rqtime != undefined && rqtime != ""){
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/options/shift/add';
+		var params="name="+name+"&rqTime="+rqtime;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+		    if(request.readyState == 4 && request.status == 200) {
+		    	document.getElementById("blocker").classList.toggle("hidden", true);
+		    	var copy = document.getElementById('copy').cloneNode(true);
+		    	var i = document.getElementById('vuorot').getElementsByTagName('div');
+		    	if(i == null || i == undefined) i = 0; else i = i.length - 2;
+		    	copy.id = name + i;
+		    	copy.getElementsByTagName('p')[0].innerHTML = "<b>"+name+"</b>";
+		    	var h = rqtime.split(":")[0];
+		    	var m = rqtime.split(":")[1];
+		    	copy.getElementsByTagName('div')[0].onclick = function(){ CreateNewShift(document.getElementById('button_thing'),name, name + i, h,m)}
+		    	copy.classList.toggle('hidden', false);
+		    	var target = document.getElementById('button_thing');
+		    	target.parentNode.insertBefore(copy, target);
+		    }
+		}
+
+		request.send(params);
+	}
+}
+
+function CreateNewShift(div, n, i, h,m){
+
+	var inputs = document.getElementById('blocker').getElementsByTagName("input");
+
+	if(n != null && i != null){
+		var time = h + ":" + m;
+		console.log(time);
+		var btnremove = document.getElementById("btn-remove");
+		btnremove.classList.toggle("hidden", false);
+		btnremove.onclick = function(){ RemoveShift(n,i); }
+		var btnsubmit = document.getElementById("btn-submit");
+		btnsubmit.onclick = function(){ EditShift(n,i); }
+		btnsubmit.value = "Tallenna muutokset";
+		document.getElementById("block-head").innerHTML = "Muokkaa vuoroa";
+		inputs[0].value = n;
+		inputs[1].value = time;
+
+	}else{
+		document.getElementById("btn-remove").classList.toggle("hidden", true);
+		document.getElementById("btn-submit").onclick = function(){ SendNewShift(); }
+		document.getElementById("btn-submit").value = "Tallenna uusi";
+		document.getElementById("block-head").innerHTML = "Luo uusi vuoro";
+		inputs[0].value = "";
+	}
+	document.getElementById("blocker").classList.toggle("hidden", false);
+}
+
+</script>

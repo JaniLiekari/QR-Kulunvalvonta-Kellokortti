@@ -1,0 +1,208 @@
+<% include ./css/pad-css.html %>
+<% include ./css/findbar-css.html %>
+
+<style type="text/css">
+	#print{
+		box-shadow: 2px 2px 5px black;
+		outline: none;
+		background-color: none;
+		margin-top: 15px;
+		margin-left: 15px;
+	}
+
+	.styled-select {
+	   background-color: white;
+	   margin-left: 10px;
+	   height: 40px;
+	   width: 200px;
+	}
+	.styled-select select {
+	   border: 1px solid #ccc;
+	   font-size: 16px;
+	   padding-left: 5px;
+	   border-radius: 5px;
+	   font-weight: 700;
+	   height: 40px;
+	   width: 228px;
+	}
+	.form-div{
+
+		width: 700px;
+		max-height: 800px;
+		overflow-y: scroll;
+		padding-bottom: 30px;
+		background-color: white;
+		border-radius: 10px;
+		border: 1px solid #3f3f3f;
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.triangle-down {
+		width: 0;
+		height: 0;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-top: 10px solid #555;
+		transition-duration: 50ms;
+	}
+	.triangle-up {
+		width: 0;
+		height: 0;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #555;
+		transition-duration: 50ms;
+	}
+	.triangle-down:hover {
+		border-top: 10px solid black;
+		cursor: zoom-out;
+	}
+	.triangle-up:hover {
+		border-bottom: 10px solid black;
+		cursor: zoom-in;
+	}
+	.sticker{
+		margin-top: 8px;
+		padding-left: 5px;
+		border: 1px solid #bfbfbf;
+		box-shadow: 1px 1px 5px #707070;
+		border-radius: 5px;
+		background-color: #dddddd;
+	}
+
+	#p_name{
+		font-size: 10px;
+		font-weight: normal;
+		font-style: normal;
+		color: black;
+	}
+
+	.redX{
+		background-color: red;
+		transition-duration: 50ms;
+	}
+
+	.redX:hover{
+		background-color: #750001;
+		cursor: pointer;
+	}
+
+
+</style>
+
+<!-- YLÄ PALKKI -->
+
+<div id="findbar" class="container-fluid show" style="padding-top: 0px; padding-bottom: 20px; box-shadow: 0px 5px 5px grey;">
+	<div>
+		<form id="form">
+			<div class="form-inline">
+				<p><b>Etunimi:  </b></p><input onchange="showPrint()" class="form-control" id="firstname" type="text" name="firstname" value="" >
+				<p><b>Sukunimi:  </b></p><input onchange="showPrint()" class="form-control" id="lastname" type="text" name="lastname" value="">
+				<p><b>Paja:  </b></p><input onchange="showPrint()" class="form-control" id="unit" type="text" name="unit" value="">
+				<p><b>Vuoro: </b><div class="styled-select">
+					<select onchange="showPrint()" id="shift2" name="shift2" value="">
+					<% if(shifts) { %>
+						<% for(var i = 0; i < shifts.length; i++) { %>
+							<option value="<%= shifts[i][0] %>"><%= shifts[i][0] %></option>
+						<%}%>
+					<%}%>
+  					</select>
+  				</div>
+  				<p style="margin-left: 40px;"><b>Vastuuhenkilö: </b><div class="styled-select">
+					<select onchange="showPrint()" id="vastuuhenk" name="vastuu" value="">
+						<option value="no_add">Ei lisätty</option>
+					<% if(admins) { %>
+						<% for(var i = 0; i < admins.length; i++) { %>
+							<option value="<%= admins[i]%>"><%= admins[i] %></option>
+						<%}%>
+					<%}%>
+  					</select>
+  				</div>
+				<input id="hidden_qr" type="hidden" name="_id" value="<%= qr %>">
+			</div>
+		</form>
+	</div>
+	<button onclick="show_hide(this, 'Piiloita tiedot', 'Näytä Tiedot')" style="position: absolute; text-align: center; height: 35px; width: 150px; margin-top: 20px; right: 30px; box-shadow: 0px 5px 5px grey; background-color: white;">Piiloita tiedot</button>
+</div>
+
+<p id="success" class="hidden" style="color: green; margin-left: 20px;">Success</p>
+<p id="failed" class="hidden" style="color: red; margin-left: 20px;">Failed</p>
+
+<div id="print" style="display: inline-block;">
+	<div id="head" style="text-align: center; width: 100%;">
+		<img src="http://<%=IP%>:<%=PORT%>/file/img/Logo300x110.png" alt="" height="135" width="390">
+		<!--<p style="padding-top: 3px">Tampereen työvalmennussäätiö Syke</p>-->
+	</div>
+	<div class="row" style="width: 100%">
+	    <div class="col-md-auto">
+	      	<img id="qr_image" src="http://<%=IP%>:<%=PORT%>/qrcode/API/<%=qr%>" alt="<%= qr %>" height="240" width="240" style="margin-left: 0px">
+	    </div>
+	    <div class="col-6" style="min-height: 200px" >
+	    	<div id="center" class="" style="width: 100%;  position: absolute; text-align: center;">
+					<p id="p_name" style="margin-top: 60px; font-size: 35px; font-weight: bold;"></p>
+			</div>
+	      	<div id="bottom" class="" style="width: 100%; text-align: center; position: absolute;  bottom: 0px;">
+					<p id="p_unit"style="font-size: 20px; margin-bottom: 0px">IT-paja</p>
+					<p id="p_shift"style="font-size: 18px; bottom: 0px;">Aamuvuoro</p>
+			</div> 
+	    </div>
+	 </div>
+	 <div style="margin-top: 10px"></div>
+</div>
+
+<div style="display: inline-block; width: 500px; position: relative; left: 150px;">
+
+	<p style="font-size: 25px; font-weight: 700;">Työpäivät:</p>
+
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Maanantai</p>
+		<input id="maanantai" type="checkbox" Checked/>
+	</label>
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Perjantai</p>
+		<input id="perjantai" type="checkbox" Checked/>
+	</label>
+	<br>
+
+
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Tiistai</p>
+		<input id="tiistai" type="checkbox" Checked/>
+	</label>
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Lauantai</p>
+		<input id="lauantai" type="checkbox" />
+	</label>
+	<br>
+
+
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Keskiviikko</p>
+		<input id="keskiviikko" type="checkbox" Checked/>
+	</label>
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Sunnuntai</p>
+		<input id="sunnuntai" type="checkbox" />
+	</label>
+	<br>
+
+
+	<label>
+		<p style="display: inline-block; width: 120px; font-weight: 700; font-size: 20px; margin-bottom: 5px; margin-left: 20px;">Torstai</p>
+		<input id="torstai" type="checkbox" Checked/>
+	</label>
+
+
+</div>
+
+<br/>
+ <button style="min-width: 140px; min-height: 35px; margin-left: 28px; margin-top: 10px;  background-color: #39db59; color: white; font-weight: 700; border: none; border-radius: 5px;" onclick="print_and_submit()">Luo ja tulosta</button>
+
+
+
+
+<% include ./scripts/print.html %>
+<% include ./scripts/create-client.html %>

@@ -1,0 +1,40 @@
+<style>
+	nav {
+	    background-color: #39db59;
+	}
+	a{
+		color: #ffffff;
+		transition: 0.3s ease-in-out;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	a:hover{
+		color: #1f4c14;
+	}
+</style>
+
+<nav id="nav-bar" style="z-index: 1" class="navbar navbar-expand-lg navbar-light">
+	 <a class="nav-link" href="/admin"><b>Etusivu (taulukko)</b></a>
+	 <% if(privileges[1] === true) { %>
+	 <a class="nav-link" href="/admin/create"><b>Luo uusi kävijä</b></a>
+	 <% } %>
+	 <a class="nav-link" href="/admin/client/info"><b>Kävijä yksityiskohtainen tieto</b></a>
+	 <a class="nav-link" href="/admin/statistic"><b>Statistiikka</b></a>
+	 <% if(plugins) { %>
+	 	<%	for(var i = 0; i < plugins.length; i++){ %>
+	 			<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
+
+	 					<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+
+	 								<% if(hook[0] == "Navbar") { %>
+	 										<%- include(hook[1])%> 
+	 							 	<%	} %>
+
+	 					<% } %>
+
+	 			<% } %>
+	 	<%	} %>
+	<% } %>
+	 <a class="nav-link" href="/admin/options"><b>Asetukset</b></a>
+	 <a class="nav-link" href="/admin/logout"><b>Kirjaudu ulos</b></a>
+</nav>

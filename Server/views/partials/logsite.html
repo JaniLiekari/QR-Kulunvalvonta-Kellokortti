@@ -1,0 +1,23 @@
+<link rel="stylesheet" href="http://<%=IP%>:<%=PORT%>/file/css/logsite.css">
+
+<div class="center">
+	<div id="head" class="head">
+		<!--<p  style="font-size: 40px; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;"><b>IT-Paja Kulunvalvonta</b></p>-->
+		<img src="http://<%=IP%>:<%=PORT%>/file/img/Logo300x110.png" alt="" height="120px" width="340px">
+		<div class="">
+			<form id="form" action="" class="" method="post">
+			    <div class="" style="text-align: center; width: 100%;">
+			    	<p style="margin-bottom: 1px;"><b>Käyttäjätunnus: </b></p>
+			        <input type="text" name="username" class="form-control col-12" id="username" placeholder= "käyttäjätunnus...">
+			        <p style="margin-top: 15px; margin-bottom: 1px;"><b>Salasana: </b></p>
+			        <input type="password" name="password" class="form-control col-12" id="password" placeholder="salasana...">
+			        <input id="btn-submit" type="submit" style="margin-top: 40px; background-color: white; border-color: white; color: black; font-weight: 700;" class="btn btn-primary col-12" value="">
+			    </div>
+			</form>
+			<button id="btn-changeAction" class="btn btn-primary" style="width: 100%; background-color: #32363d; border-color: #202226; color: white; font-weight: 700;" onclick=""></button> 
+		</div>
+	</div>
+</div>
+
+
+<% include ./scripts/logsiteHandler.html %>
