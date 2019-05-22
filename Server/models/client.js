@@ -20,7 +20,8 @@ var Client = new Schema({
 	unit: String,
 	workDays: [Boolean],
 	id: String,
-	vastuu: String
+	vastuu: String,
+	createDate: Date
 
 });
 

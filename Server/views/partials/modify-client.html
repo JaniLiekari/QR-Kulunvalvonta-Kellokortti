@@ -156,6 +156,7 @@ function Is4Hours(f1, f2){
 			<p><b>Viikon keskimääräinen oleskeluaika: </b><% if(data != null) { %><%= data['average_Week'] %><% } %></p>
 			<p><b>Maximi aika: </b><% if (data != null ) { %><%= data['maxTime'] %><% } %></p>
 			<p><b>Minimi aika: </b><% if (data != null ) { %><%= data['minTime'] %><% } %></p>
+			<p><b>Poissaolot: </b><%= absence %>kpl</p>
 			<p style="<% if(vastuu == "Ei lisätty") { %> <%="color: red" %><%}%>"><b>Vastuuhenkilö: </b><%=vastuu%></p>
 			<% if(privileges[3] === true) { %><button class="btn" style="background-color: #39db59; height: 40px; border-radius: 10px; color: white; padding-left: 10px; padding-right: 10px; border: 1px solid green;" onclick="editUser('<% if (data != null ) { %><%= data['qr'] %><% } %>');"><b>Muokkaa kävijää</b></button> <% } %>
 

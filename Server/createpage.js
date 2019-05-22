@@ -133,7 +133,8 @@ router.post('/', PrivilegesHandler.islogedIn, async function(req,res, error){
 		unit: _unit,
 		id: _id,
 		workDays: workDays,
-		vastuu: vast
+		vastuu: vast,
+		createDate: new Date()
 	});
 
 	new_client.save(function(err){

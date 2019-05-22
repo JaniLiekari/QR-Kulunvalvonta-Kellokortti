@@ -327,7 +327,10 @@ app.route('/*')
 	})
 
 
-console.log('\nServer is up and running on port 6060...\n');
-app.listen(config.port);
+app.listen(8080);
+
+
+
+
 
 

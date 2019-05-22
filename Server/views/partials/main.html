@@ -221,7 +221,23 @@ function GetMyShift(name){
 						<tag id="<%= data[i]['firstname'] + data[i]['lastname'] + '.' + j %>-meta" data-i="<%= j %>" data-id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>" data-firstname="<%= data[i]['firstname'] %>" data-lastname="<%= data[i]['lastname'] %>" data-date="<%= data[0][j] %>" data-shift="<%= data[i]['shift']%>"></tag>
 
 						<!--- HOLDERI PÄIVÄN TIEDOILLE JA MUOKKAAMISELLE --->
-						<td id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-day" class="table-block">
+
+						<% bgColor = "white";
+						var cwd = data[i]['days'][target][3];
+						var twd = data[i]['days'][target][4][data[i]['days'][target][5]];
+
+						if(cwd != twd){
+							if(cwd == true){
+								bgColor = "#e2baa6";
+							}else{
+								bgColor = "#cea7e2";
+							}
+						} %>
+
+
+
+
+						<td id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-day" class="table-block" style="background-color: <%= bgColor %>">
 						
 
 

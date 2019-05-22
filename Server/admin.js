@@ -40,7 +40,7 @@ router.use('/create', require('./createpage.js'));
 router.use('/client', require('./clientpage.js').router);
 router.use('/options', require('./optionspage.js'));
 router.use('/backup', require('./backupservice.js'));
-router.use('/statistic', require('./statisticpage.js'));
+router.use('/statistic', require('./statisticpage.js').router);
 router.use('/qrcode', require('./qrcode.js').router);
 
 //SETTING PASSPORT USE PACKAGES AND INITIALIZE IT
@@ -221,6 +221,12 @@ module.exports.setUp = function(){
 		if(clients){
 			var x = 0;
 			for(var i = 0; i < clients.length; i++){
+				if(clients[i]['createDate'] == null || clients[i]['createDate'] == undefined){
+					clients[i]['createDate'] = new Date();
+					clients[i].save(function(err){
+
+					});
+				}
 				if(clients[i]['workDays'] == null ||clients[i]['workDays'] == undefined){
 					x++;
 					var workDays = [false, true, true, true, true, true, false];

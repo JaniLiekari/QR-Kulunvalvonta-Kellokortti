@@ -14,6 +14,8 @@ var path = require('path');
 
 var PageConfig = require('./models/config');
 
+var statistic =  require('./statisticpage.js');
+
 async function GetPageSettings(){
 	
 	var pageSettings;
@@ -391,6 +393,7 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 				}else{
 					var vast = (client['vastuu'] != null) ? client['vastuu'] : "Ei lisätty";
 					var data = [];
+
 					data['qr'] = client['id'];
 					data['name'] = f_name + " " + l_name;
 					data['firstname'] = f_name;
@@ -435,6 +438,7 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 					startDay = Extented.setDateHMS(startDay, 0,0,1);
 					endDay = Extented.setDateHMS(endDay, 23,59,59);
 
+					var absence = await statistic.GetMissing(startDay, new Date(), [client]);
 
 					var alldays = [];
 					var z = 0;
@@ -646,7 +650,14 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 					data['average_Week'] = tempWeek;
 
 					var adminList = await GetAdmins();
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: data, privileges: privileges, names: null, shifts: shifts, IP:Config.ip, PORT: Config.port, workDays: client['workDays'], vastuu: vast, admins: adminList, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username,
+										 page: "modify-client", data: data,
+										 privileges: privileges, names: null, 
+										 shifts: shifts, IP:Config.ip, 
+										 PORT: Config.port, workDays: client['workDays'], 
+										 vastuu: vast, admins: adminList, 
+										 pageSettings: null, plugins: require('./admin.js').plugins, 
+										 wsSecret: req.session.websocketSecret, absence: absence});
 				}
 			});
 		}catch(error){

@@ -220,6 +220,8 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 				  						}
 
 				  						dayData.push(clients[i]['loggins'][j]['workDay']);
+				  						dayData.push(clients[i]['workDays']);
+				  						dayData.push(c_date.getDay());
 				  						personData.push(dayData);
 
 				  					}

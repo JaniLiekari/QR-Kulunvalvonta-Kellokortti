@@ -21,6 +21,7 @@
 	   -webkit-box-shadow: inset 0 0 10px 1px #000000;
 	   box-shadow:         inset 0 0 10px 1px #000000;
 		z-index: 0;
+		pointer-events: none;
 	}
 
 	.side-header{
@@ -104,7 +105,7 @@
 		width: 200px;
 		text-align: center;
 		display: block;
-		z-index: 200;
+		z-index: 999;
 		padding: 5px 5px 5px 5px;
 		color: white;
 		background-color: black;
@@ -119,12 +120,54 @@
 		overflow-x: hidden;
 
 	}
+	.loading{
+		visibility: visible;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+	.loading:after{
+		visibility: visible;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		content: '';
+		box-sizing: border-box;
+		width: 40px;
+		height: 40px;
+		margin-top: -10px;
+		margin-left: -10px;
+		border-radius: 50%;
+		border: 4px solid #ccc;
+		border-top-color: #333;
+		animation: spinner .8s linear infinite;
+	}
 
+	@keyframes spinner {
+	  to {transform: rotate(360deg);}
+	}
+
+	.styled-select {
+	margin: auto 0;
+	background-color: white;
+	margin-top: 3px;
+	height: 40px;
+	width: 200px;
+	}
+	.styled-select select {
+		border: 1px solid #ccc;
+		font-size: 16px;
+		padding-left: 5px;
+		border-radius: 5px;
+		font-weight: 700;
+		height: 40px;
+		width: 228px;
+	}
 
 </style>
 
-
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div id="wrapper" class="wrapper" style="position: relative;">
 
@@ -137,32 +180,116 @@
 
 
 		<div class="side-content">
-			<p>Yhteensä käyttäjiä: <%= clients %> kpl</p>
-			<p>Paikalla: <%= currentIn %> kpl</p>
-			<p>Päivän kirjautumiset: <%= fullDayLoggins %> kpl</p>
-			<p>Uloskirjautuneet: <%= fullDayLoggins - currentIn %> kpl</p>
+			<p id="useramount">Yhteensä käyttäjiä: ??? kpl</p>
+			<p id="currentin">Paikalla: ??? kpl</p>
+			<p id="dayloggins">Päivän kirjautumiset: ??? kpl</p>
+			<p id="dayloggouts">Uloskirjautuneet: ??? kpl</p>
 		</div>
 
 		<div class="side-content" style="margin-top: 20px;">
-			<p>Päivien täyttymisprosentti (7pv) : <%= EST %>%</p>
+			<p id="successprosent">Täyttymisprosentti (7pv) : ???%</p>
+			<p id="missing">Poissaolot (7pv) : ???kpl</p>
+		</div>
+
+		<div class="side-content" style="position: absolute; bottom: 30px;">
+			<p style="font-size: 20px; position: relative; left: 50%; transform: translate(-50%, 0);">HAKU ASETUKSET</p>
+			<p style="font-size: 14px;">FILTERIT</p>
+			<p style="font-size: 12px">Vuoro:</p>
+			<div style="display: inline-block; margin-left: 25px;" class="styled-select">
+				<select id="shift" name="shift" value="">
+					<option value="-" selected>Kaikki</option>
+					<% if(shifts) { %>
+						<%  for(var i = 0; i < shifts.length; i++) { %>
+							<option value="<%= shifts[i][0] %>"><%= shifts[i][0] %></option>
+						<%}%>
+					<%}%>
+		  		</select>
+		  	</div>
+			<p style="margin-top: 15px; font-size: 14px;">HAE AJALTA</p>
+			<p style="font-size: 12px">Mistä:</p>
+				<input id="start" style="margin-left: 25px; z-index: 999;" type="date" name="startDay" value="">
+			<p style="font-size: 12px">Mihin:</p>
+				<input id="end" style="margin-left: 25px;" type="date" name="endDay">
+
+
+			<button class="btn" style="width: 200px; margin-top: 15px; margin-left: 25px;" onclick="ReloadStatistic();">Hae</button>
 		</div>
 
 	</div>
 	<div style="width: 85%; height: 100%; display: inline-block; z-index: 666; text-align: center; position: relative;">
-		<p style="font-size: 24px; font-weight: 700; margin-top: 50px;">KIRJAUTUMISET (30PV)</p>			
-			<div id="curve_chart" style="width: 1000px; height: 500px; left: 50%; position: relative; transform: translate(-50%, 0);"></div>
+		<p style="font-size: 24px; font-weight: 700; margin-top: 50px;">KIRJAUTUMISET</p>			
+			<div id="curve_chart" style="width: 1000px; height: 500px; left: 50%; position: relative; transform: translate(-50%, 0); z-index: 300;"></div>
+			<div style="position: absolute; left: 50%; top: 630px; transform: translate(-50%, 0); width: 200px; height: 100px; text-align: center;"><p style="font-weight: 700; font-size: 18px; z-index: 300">PÄIVÄMÄÄRÄ</p></div>
+			<div style="position: absolute; left: 210px; transform: rotate(-90deg); top: 300px; height: 50px;  width: 200px; height: 100px; text-align: center;"><p style="font-weight: 700; font-size: 18px;">KIRJAUTUMISET</p></div>
 	</div>
 
 
 </div>
 
-
+<div id="loading" class="">
+	
+</div>
 
 <script type="text/javascript">
+
 	
+/* DATA LOADING FUNCTIONS */
+
+function Filters(shift){
+	this.shift = shift 
+}
 
 
+var LoadStatData = function LoadStatData(next, endDay, startDay){
 
+	document.getElementById('loading').classList.toggle('loading', true);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/statistic/stats';
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	var params = "endDay="+endDay+"&startDay="+startDay;
+
+	var filterShift = document.getElementById("shift").value != "-" ? document.getElementById("shift").value : null;
+
+	var Filter = new Filters(filterShift);
+	params += "&filter="+JSON.stringify(Filter);
+	request.onreadystatechange = function() {
+	   	if(request.readyState == 4 && request.status == 200) {
+	    	var response = JSON.parse(request.responseText);
+	    	document.getElementById("useramount").innerHTML = "Yhteensä käyttäjiä: "+response.clients+"kpl";
+	    	document.getElementById("currentin").innerHTML = "Paikalla: "+response.currentini+"kpl";
+	    	document.getElementById("dayloggins").innerHTML = "Päivän kirjautumiset: "+response.currentinb+"kpl";
+	    	document.getElementById("dayloggouts").innerHTML = "Uloskirjautuneet: "+response.currentino+"kpl";
+	    	document.getElementById("successprosent").innerHTML = "Täyttymisprosentti: "+response.Estimate+"%";
+	    	document.getElementById("missing").innerHTML = "Poissaolot: "+response.missing+"kpl";
+
+	    	next(endDay, startDay);
+	    }
+	}
+
+	request.send(params);
+}
+var LoadChartData = function LoadChartData(endDay, startDay){
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/statistic/chartData';
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	var params = "endDay="+endDay+"&startDay="+startDay;
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	missing = request.responseText;
+	    	console.log("RESPONSE? " + request.responseText);
+	    	data = JSON.parse(request.responseText);
+	    	LoadChart();
+
+	    	document.getElementById('loading').classList.toggle('loading', false);
+
+	    }
+	}
+
+	request.send(params);
+}
 
 
 
@@ -178,151 +305,156 @@ function FixWrapper(){
 
 }
 
+
 document.onload = FixWrapper();
 
 
 
 
-</script>
+var chart = document.getElementById('curve_chart');
 
+var oneDataLenght;
+var oneDataOffset;
+var width = chart.offsetWidth;
+var height = chart.offsetHeight - 10;
+var maxHeight = -999;
+var data;
 
-<script type="text/javascript">
-
-
-
-    var chart = document.getElementById('curve_chart');
-
-    var oneDataLenght;
-    var oneDataOffset;
-    
-	var width = chart.offsetWidth;
-	var height = chart.offsetHeight - 10;
-	var maxHeight = 0;
-    var data = [];
-    <% for(var x = 1; x < chartData.length; x++) { %>
-
-    	var d = [];
-    	d.push(<%=chartData[x][0]%>);
-    	d.push(<%=chartData[x][1]%>);
-    	var usr = [];
-    	<% for(var y = 0; y < chartData[x][2].length; y++) { %>
-    		usr.push("<%= chartData[x][2][y] %>");
-    	<% } %>
-    	d.push(usr);
-    	data.push(d);
-    <% } %>
-
-    console.log(data);
-
-
-    var oneDataHeight;
+var oneDataHeight;
 
 
 
-    function LoadChart(content, type){
-    	SetSize();
-    	LoadBGLines();
-    	TowerCreator();
+function LoadChart(){
+	Clear();
+    SetSize();
+    LoadBGLines();
+    TowerCreator();
+}
+
+
+function Clear(){
+	while (chart.firstChild) {
+    	chart.removeChild(chart.firstChild);
+	}
+}
+
+function LoadBGLines(){
+    for(var i = 0; i <= maxHeight; i++){
+    	if(maxHeight < 15 || i % 2 == 1)
+    		AddLine(0, i*oneDataHeight, width+"px", "1px", i, "data-left");
     }
 
-    function LoadBGLines(){
-    	for(var i = 0; i <= maxHeight; i++){
-    		if(maxHeight < 15 || i % 2 == 1)
-    			AddLine(0, i*oneDataHeight, width+"px", "1px", i, "data-left");
+    for(var i = 0; i < data["data"].length; i++){
+    	if(i % 2 == 1){
+    		AddLine(i*oneDataLenght + (oneDataLenght / 2), 0, "1px", (height+8)+"px", data["data"][i]["date"], "data-under");
     	}
+   	}
+}
 
-    	for(var i = 0; i < data.length; i++){
-    	
-    		if(i % 2 == 1){
-    			AddLine(i*oneDataLenght + (oneDataLenght / 2), 0, "1px", (height+8)+"px", data[i][0], "data-under");
+function SetSize(){
+    oneDataLenght = width / data["data"].length;
+    oneDataOffset = oneDataLenght / 15;
+
+    for(var i = 0; i < data["data"].length; i++){
+    	if(data["data"][i]["users"].length > maxHeight){
+    		maxHeight = data["data"][i]["users"].length;
+    	}
+    }
+
+    oneDataHeight = height / maxHeight;
+}
+
+
+function TowerCreator(){
+    for(var i = 0; i < data["data"].length; i++){
+   		var positionX = i*oneDataLenght;
+    	var h = data["data"][i]["users"].length * oneDataHeight;
+    	if(h < 10)
+   			h = 10;
+   		var usr = "";
+   		var absence = "";
+   		for(var j = 0; j < data["data"][i]["users"].length;j++){
+    		usr+=data["data"][i]["users"][j];
+    		if(j < data["data"][i]["users"].length-1)
+    			usr+="\n";
+    	}for(var j = 0; j < data["data"][i]["absence"].length; j++){
+    		absence+=data["data"][i]["absence"][j];
+    		if(j < data["data"][i]["absence"].length-1){
+    			absence+="\n";
     		}
     	}
-
+    	AddTower(h,positionX,"Päivä: "+ data["data"][i]["date"] + "\nKirjautumiset: " + data["data"][i]["users"].length +"\nPoissaolot: "+ data["data"][i]["absence"].length + "\n\nKäyttäjät:\n" + usr + "\n\nPoissaolijat:\n" + absence);
     }
-
-    function SetSize(){
-    
-
-    	oneDataLenght = width / 30;
-
-    	oneDataOffset = oneDataLenght / 15;
-
-
-    	
-    	for(var i = 0; i < data.length; i++){
-    		if(data[i][1] > maxHeight){
-    			maxHeight = data[i][1];
-    		}
-    	}
-    	oneDataHeight = height / maxHeight;
-
-    	console.log(oneDataHeight);
-    	console.log(maxHeight);
-
-    }
-
-
-    function TowerCreator(){
-
-    	for(var i = 0; i < data.length; i++){
-    		var positionX = i*oneDataLenght;
-    		var h = data[i][1] * oneDataHeight;
-    		if(h < 10)
-    			h = 10;
-    		var usr = "";
-    		console.log("DATA[2]: " + data[i][2])
-    		for(var j = 0; j < data[i][2].length;j++){
-    			usr+=data[i][2][j];
-    			if(j < data[i][2].length-1)
-    				usr+="\n";
-    		}
-    		AddTower(h,positionX,"Päivä: "+ data[i][0] + "\nKirjautumiset: " + data[i][1] + "\n\nKäyttäjät:\n" + usr);
-    	}
-
-    }
+}
 
 
 	/* DRAW FUNCTIONS */
 
-    function AddLine(positionX, positionY, w, h, data, pclass){
-    	var div = document.createElement('div');
-    	div.classList.toggle('line');
-    	div.style.setProperty('height', h);
-    	div.style.setProperty('width', w);
-    	div.style.setProperty('left', positionX);
-    	div.style.setProperty('bottom', positionY);
+function AddLine(positionX, positionY, w, h, data, pclass){
+    var div = document.createElement('div');
+    div.classList.toggle('line');
+    div.style.setProperty('height', h);
+    div.style.setProperty('width', w);
+    div.style.setProperty('left', positionX);
+    div.style.setProperty('bottom', positionY);
 
-    	var p = document.createElement('p');
-    	p.classList.toggle(pclass);
-    	p.innerHTML = data;
-    	div.appendChild(p);
+    var p = document.createElement('p');
+    p.classList.toggle(pclass);
+    p.innerHTML = data;
+    div.appendChild(p);
 
-    	chart.appendChild(div);
-    }
+    chart.appendChild(div);
+}
 
-    function AddTower(h, positionX, amount){
+function AddTower(h, positionX, amount){
+    var div = document.createElement('div');
+    div.classList.toggle('tower');
+    div.style.setProperty('--height', h);
+    div.style.setProperty('height', h);
+    div.style.setProperty('left', positionX);
+    div.style.setProperty('width', oneDataLenght);
 
-    	var div = document.createElement('div');
-    	div.classList.toggle('tower');
-    	div.style.setProperty('--height', h);
-    	div.style.setProperty('height', h);
-    	div.style.setProperty('left', positionX);
-    	div.style.setProperty('width', oneDataLenght);
-
-    	div.setAttribute("text", amount);
-    	chart.appendChild(div);
-
-    }
+    div.setAttribute("text", amount);
+    chart.appendChild(div);
+}
 
 
 
 
+function GetLastMonth(){
 
-document.onload = LoadChart('kirjautumiset', 'tower'); 
+	var today = new Date();
+	today.setDate(today.getDate() - 1);
+	var lastMonth = new Date();
+	lastMonth.setDate(today.getDate() - 30);
+
+	LoadStatData(LoadChartData, today, lastMonth);
+
+}
+
+function ReloadStatistic(){
+
+	var start = document.getElementById('start').value;
+	var end = document.getElementById('end').value;
+
+	if(end == undefined ||end == null ||start == undefined ||start == null){
+		return;
+	}
+	if(end < start)
+		return;
+
+
+	LoadStatData(LoadChartData, end, start);
+
+
+}
+
+document.onload = GetLastMonth();
 
 
 
 
 
 
-  </script>
+
+ </script>
