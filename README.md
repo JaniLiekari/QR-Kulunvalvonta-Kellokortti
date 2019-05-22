@@ -6,6 +6,18 @@ Yksinkertainen ja helppo UI.
 ![Esimerkki etusivu](https://raw.githubusercontent.com/JaniLiekari/QR-TimeCard/master/Docs/IMGS/README.png)
 - - - -
 
+
+## TARVITTAVAT ASIAT: ##
+* QR Koodilukija. 
+  > Joka kykenee syöttämään usb portin kautta näppäimistö syötettä.
+* Serveri tietokone. 
+  > Testattu windows 10, Ubuntu v. ??? ja Debian 9.
+* Windows 7 tai 10 client sovellukselle. 
+  > Voi olla sama kuin serveri jos on windows 10, mielummin eri.
+
+- - - -
+
+
 ## Pääominaisuudet: ##
 * Luo uusi kävijä/asiakas
 * Tulosta asiakkaalle QR:n pohjautuva kulkukortti
