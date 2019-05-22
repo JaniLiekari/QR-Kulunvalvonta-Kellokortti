@@ -73,5 +73,22 @@ Navigoi shellillä asennuskansioon. Kirjoita komento npm init. Tarkista että ko
 ### Asetukset ###
 Navigoi sovelluksen juureen ja avaa tiedosto config.js. Tarkista kohdat  url ( mongodb osoite / databasen nimi ), ip (serverin ip) & port (avoin portti jota serveri kuuntelee).
 
+```javascript
+module.exports = {
+
+	url : "mongodb://localhost/logsite",
+	sessionOptions : {
+
+		  secret: "salaisuus",
+		  cookie : { username: "username", httpOnly: true, maxAge: null }
+	},
+
+	ip : "127.0.0.1",
+	port : 808
+	
+};
+```
+
+
 ### Käynnistys ###
 Lisää app.js joko serviceksi tai vaihtoehtoisesti voit asentaa sudo apt-get install nodemon -g. Nodemonilla sovellus käynnistyy kohdekansiossa ollessa komennolla nodemon. Voit myös testata sovellusta komennolla node app.js.
