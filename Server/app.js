@@ -51,9 +51,7 @@ function Clean(){
 }
 
 
-console.log('\n'+"WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
-console.log("WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
-console.log("WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
+
 Clean();
 admin.clean();
 admin.setUp();
@@ -327,7 +325,7 @@ app.route('/*')
 	})
 
 
-app.listen(8080);
+app.listen(config.port);
 
 
 
