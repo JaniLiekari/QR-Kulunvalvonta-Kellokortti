@@ -1,3 +1,3 @@
 # QR-TimeCard
 
-![Esimerkki etusivu]("http://lmsotfy.com/so.png")
+![Esimerkki etusivu](https://raw.githubusercontent.com/JaniLiekari/QR-TimeCard/master/Docs/IMGS/README.png)
