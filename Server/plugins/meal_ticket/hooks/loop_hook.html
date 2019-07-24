@@ -11,9 +11,20 @@
 
 	function LOOP(){
 		if(USERNAMES.length > 0){
+			
+			buildStart = false;
+		  	buildEnd = false;
+		  	ticketIndex = 0;
+
 			for(var i = 0; i < USERNAMES.length; i++){
+				if(i == USERNAMES.length - 1)
+		  				buildEnd = true;
 				BuildAsset(USERNAMES[i][0]+" "+USERNAMES[i][1]);
 			}
+
+			ticketIndex = 0;
+		  	buildStart = false;
+		  	buildEnd = false;
 		}
 	}
 
@@ -21,12 +32,13 @@
 	function SaveUsernames(){
 
 		  <% if(data !== null && data.length > 1){ %>
-
+		  	
 		  		<% for(var i = 1; i < data.length; i++){ %>
-
+		  	
 		  			USERNAMES.push(["<%= data[i]['firstname'] %>","<%= data[i]['lastname'] %>"]);
 
 		  		<% } %>
+
 
 		  <% } %>
 
