@@ -3,7 +3,6 @@
 HTML, JAVASCRIPT, NODEJS, C# Pohjalta tehty serveri/client kokonaisuus esim työpajan asiakkaiden kulkemisen seuraamiseksi.
 Yksinkertainen ja helppo UI.
 
-![Esimerkki etusivu](https://raw.githubusercontent.com/JaniLiekari/QR-TimeCard/master/Docs/IMGS/README.png)
 - - - -
 
 
