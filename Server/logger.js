@@ -12,7 +12,7 @@ module.exports.WriteInFile = async function WriteInFile(file,text, name){
 	text = '\r\n'+ "["+string+"]  " + text;
 	if(fs.existsSync(file)){
 		data = data + fs.readFileSync(file, 'utf8');
-	}else if(text != "["+string+"]  " + 'SYKE LOG ['+name+']'  + '\r\n'){
+	}else if(text != "["+string+"]  " + 'SYKE LOG ['+name+']'  + '\r\n'){														
 		data = "["+string+"]  " + 'SYKE LOG ['+name+']'  + '\r\n';
 	}
 

@@ -17,8 +17,8 @@ router.get('/API/:Data', function(req,res){
 
 	QRCode.toFile(datapath, req.params.Data, {
 		color: {
-		    dark: '#000000',  // Black
-		    light: '#ffffff' // White
+		    dark: '#000000',
+		    light: '#ffffff'
 		}
 	}, async function (err) {
 		if (err) { 

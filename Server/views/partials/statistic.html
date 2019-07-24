@@ -1,172 +1,5 @@
-<style>
-	
-	.leftside{
-		width: 15%;
-		background-color: #39db59;
-		float: left;
-		height: 100%;
-		display: inline-block;
-		position: relative;
-
-
-	}
-
-	.leftside:before{
-		content: "";
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		top: 0;
-		-moz-box-shadow:    inset 0 0 10px 1px #000000;
-	   -webkit-box-shadow: inset 0 0 10px 1px #000000;
-	   box-shadow:         inset 0 0 10px 1px #000000;
-		z-index: 0;
-		pointer-events: none;
-	}
-
-	.side-header{
-		
-		text-align: center;
-		padding-top: 30px;
-		padding-bottom: 10px;
-		width: 100%;
-
-	}
-	.side-header p{
-		font-size: 30px;
-		color: white;
-		text-shadow: 0 0 5px black;
-		font-weight: 700;
-		margin-bottom: 0;
-	}
-
-	.side-content p{
-		font-size: 18px;
-		position: relative;
-		margin-left: 20px;
-		margin-bottom: 3px;
-		font-weight: 700;
-		color: white;
-		text-shadow: 0 0 5px black;
-		transition-duration: 100ms;
-	}
-
-	.tower{
-		position: absolute;
-		display: block;
-		background-color: #4286f4;
-		border: 2px ridge #102b56;
-		bottom: 0;
-		animation: growTower 1.5s linear;
-		box-shadow: 0 0 0px 0px black;
-		transition-duration: 100ms;
-		z-index: 2;
-	}
-
-	.line{
-		display: block;
-		background-color: #4f4f4f;
-		position: absolute;
-	}
-	.line p{
-		position: absolute;
-		font-size: 15px;
-		font-weight: 700;
-	}
-	.data-left{
-		left: -20px;
-		top: 50%;
-		transform: translate(0, -50%);
-	}
-	.data-under{
-		bottom: -40px;
-		left: 50%;
-		transform: translate(-50%, 0);
-	}
-
-	@keyframes growTower {
-	  from {height: 0;}
-	  to {height:var(--height);}
-	}
-
-	.tower:hover{
-		cursor: pointer;
-		z-index: 5;
-		box-shadow: 0 0 5px 3px #00faff;
-	}
-
-
-
-	.tower:hover:after{
-		content: attr(text);
-		position: relative;
-		top: 50%; 
-		right: -35px;
-		width: 200px;
-		text-align: center;
-		display: block;
-		z-index: 999;
-		padding: 5px 5px 5px 5px;
-		color: white;
-		background-color: black;
-		white-space: pre-wrap;
-		min-height: 60px;
-
-		border: 2px solid white;
-		box-shadow: 2px 2px 5px 2px black;
-		max-height: 300px;
-
-		overflow-y: auto;
-		overflow-x: hidden;
-
-	}
-	.loading{
-		visibility: visible;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
-	.loading:after{
-		visibility: visible;
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		content: '';
-		box-sizing: border-box;
-		width: 40px;
-		height: 40px;
-		margin-top: -10px;
-		margin-left: -10px;
-		border-radius: 50%;
-		border: 4px solid #ccc;
-		border-top-color: #333;
-		animation: spinner .8s linear infinite;
-	}
-
-	@keyframes spinner {
-	  to {transform: rotate(360deg);}
-	}
-
-	.styled-select {
-	margin: auto 0;
-	background-color: white;
-	margin-top: 3px;
-	height: 40px;
-	width: 200px;
-	}
-	.styled-select select {
-		border: 1px solid #ccc;
-		font-size: 16px;
-		padding-left: 5px;
-		border-radius: 5px;
-		font-weight: 700;
-		height: 40px;
-		width: 228px;
-	}
-
-</style>
+<meta name="viewport" content="initial-scale=1.0 , minimum-scale=1.0 , maximum-scale=1.0" />
+<link rel="stylesheet" type="text/css" href="http://<%=IP%>:<%=PORT%>/file/css/statistic.css">
 
 
 <div id="wrapper" class="wrapper" style="position: relative;">
@@ -192,9 +25,9 @@
 		</div>
 
 		<div class="side-content" style="position: absolute; bottom: 30px;">
-			<p style="font-size: 20px; position: relative; left: 50%; transform: translate(-50%, 0);">HAKU ASETUKSET</p>
-			<p style="font-size: 14px;">FILTERIT</p>
-			<p style="font-size: 12px">Vuoro:</p>
+			<p style="font-size: 1.2vw; position: relative; left: 50%; transform: translate(-50%, 0);">HAKU ASETUKSET</p>
+			<p style="font-size: 1.0vw;">FILTERIT</p>
+			<p style="font-size: 0.9vw">Vuoro:</p>
 			<div style="display: inline-block; margin-left: 25px;" class="styled-select">
 				<select id="shift" name="shift" value="">
 					<option value="-" selected>Kaikki</option>
@@ -219,8 +52,8 @@
 	<div style="width: 85%; height: 100%; display: inline-block; z-index: 666; text-align: center; position: relative;">
 		<p style="font-size: 24px; font-weight: 700; margin-top: 50px;">KIRJAUTUMISET</p>			
 			<div id="curve_chart" style="width: 1000px; height: 500px; left: 50%; position: relative; transform: translate(-50%, 0); z-index: 300;"></div>
-			<div style="position: absolute; left: 50%; top: 630px; transform: translate(-50%, 0); width: 200px; height: 100px; text-align: center;"><p style="font-weight: 700; font-size: 18px; z-index: 300">PÄIVÄMÄÄRÄ</p></div>
-			<div style="position: absolute; left: 210px; transform: rotate(-90deg); top: 300px; height: 50px;  width: 200px; height: 100px; text-align: center;"><p style="font-weight: 700; font-size: 18px;">KIRJAUTUMISET</p></div>
+			<div style="position: absolute; left: 50%; top: 630px; transform: translate(-50%, 0); text-align: center;"><p style="font-weight: 700; font-size: 18px; z-index: 300">PÄIVÄMÄÄRÄ</p></div>
+			<div style="position: absolute; left: 210px; transform: rotate(-90deg); top: 300px; height: 50px;  text-align: center;"><p style="font-weight: 700; font-size: 18px;">KIRJAUTUMISET</p></div>
 	</div>
 
 
@@ -230,17 +63,11 @@
 	
 </div>
 
+
+
 <script type="text/javascript">
-
 	
-/* DATA LOADING FUNCTIONS */
-
-function Filters(shift){
-	this.shift = shift 
-}
-
-
-var LoadStatData = function LoadStatData(next, endDay, startDay){
+	var LoadStatData = function LoadStatData(next, endDay, startDay){
 
 	document.getElementById('loading').classList.toggle('loading', true);
 	var request =  new XMLHttpRequest();
@@ -250,9 +77,12 @@ var LoadStatData = function LoadStatData(next, endDay, startDay){
 	var params = "endDay="+endDay+"&startDay="+startDay;
 
 	var filterShift = document.getElementById("shift").value != "-" ? document.getElementById("shift").value : null;
-
-	var Filter = new Filters(filterShift);
+	var filterCreation = true;
+	var Filter = new Filters(filterShift, filterCreation);
 	params += "&filter="+JSON.stringify(Filter);
+
+	console.log(params);
+
 	request.onreadystatechange = function() {
 	   	if(request.readyState == 4 && request.status == 200) {
 	    	var response = JSON.parse(request.responseText);
@@ -276,6 +106,11 @@ var LoadChartData = function LoadChartData(endDay, startDay){
 	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	var params = "endDay="+endDay+"&startDay="+startDay;
 
+	var filterShift = document.getElementById("shift").value != "-" ? document.getElementById("shift").value : null;
+	var filterCreation = true;
+	var Filter = new Filters(filterShift, filterCreation);
+	params += "&filter="+JSON.stringify(Filter);
+
 	request.onreadystatechange = function() {
 	    if(request.readyState == 4 && request.status == 200) {
 	    	missing = request.responseText;
@@ -291,170 +126,5 @@ var LoadChartData = function LoadChartData(endDay, startDay){
 	request.send(params);
 }
 
-
-
-function FixWrapper(){
-
-	var wrapper = document.getElementById("wrapper");
-	var nav = document.getElementById("nav-bar");
-
-	var height = window.innerHeight - nav.offsetHeight;
-
-	wrapper.style.height = height+"px";
-
-
-}
-
-
-document.onload = FixWrapper();
-
-
-
-
-var chart = document.getElementById('curve_chart');
-
-var oneDataLenght;
-var oneDataOffset;
-var width = chart.offsetWidth;
-var height = chart.offsetHeight - 10;
-var maxHeight = -999;
-var data;
-
-var oneDataHeight;
-
-
-
-function LoadChart(){
-	Clear();
-    SetSize();
-    LoadBGLines();
-    TowerCreator();
-}
-
-
-function Clear(){
-	while (chart.firstChild) {
-    	chart.removeChild(chart.firstChild);
-	}
-}
-
-function LoadBGLines(){
-    for(var i = 0; i <= maxHeight; i++){
-    	if(maxHeight < 15 || i % 2 == 1)
-    		AddLine(0, i*oneDataHeight, width+"px", "1px", i, "data-left");
-    }
-
-    for(var i = 0; i < data["data"].length; i++){
-    	if(i % 2 == 1){
-    		AddLine(i*oneDataLenght + (oneDataLenght / 2), 0, "1px", (height+8)+"px", data["data"][i]["date"], "data-under");
-    	}
-   	}
-}
-
-function SetSize(){
-    oneDataLenght = width / data["data"].length;
-    oneDataOffset = oneDataLenght / 15;
-
-    for(var i = 0; i < data["data"].length; i++){
-    	if(data["data"][i]["users"].length > maxHeight){
-    		maxHeight = data["data"][i]["users"].length;
-    	}
-    }
-
-    oneDataHeight = height / maxHeight;
-}
-
-
-function TowerCreator(){
-    for(var i = 0; i < data["data"].length; i++){
-   		var positionX = i*oneDataLenght;
-    	var h = data["data"][i]["users"].length * oneDataHeight;
-    	if(h < 10)
-   			h = 10;
-   		var usr = "";
-   		var absence = "";
-   		for(var j = 0; j < data["data"][i]["users"].length;j++){
-    		usr+=data["data"][i]["users"][j];
-    		if(j < data["data"][i]["users"].length-1)
-    			usr+="\n";
-    	}for(var j = 0; j < data["data"][i]["absence"].length; j++){
-    		absence+=data["data"][i]["absence"][j];
-    		if(j < data["data"][i]["absence"].length-1){
-    			absence+="\n";
-    		}
-    	}
-    	AddTower(h,positionX,"Päivä: "+ data["data"][i]["date"] + "\nKirjautumiset: " + data["data"][i]["users"].length +"\nPoissaolot: "+ data["data"][i]["absence"].length + "\n\nKäyttäjät:\n" + usr + "\n\nPoissaolijat:\n" + absence);
-    }
-}
-
-
-	/* DRAW FUNCTIONS */
-
-function AddLine(positionX, positionY, w, h, data, pclass){
-    var div = document.createElement('div');
-    div.classList.toggle('line');
-    div.style.setProperty('height', h);
-    div.style.setProperty('width', w);
-    div.style.setProperty('left', positionX);
-    div.style.setProperty('bottom', positionY);
-
-    var p = document.createElement('p');
-    p.classList.toggle(pclass);
-    p.innerHTML = data;
-    div.appendChild(p);
-
-    chart.appendChild(div);
-}
-
-function AddTower(h, positionX, amount){
-    var div = document.createElement('div');
-    div.classList.toggle('tower');
-    div.style.setProperty('--height', h);
-    div.style.setProperty('height', h);
-    div.style.setProperty('left', positionX);
-    div.style.setProperty('width', oneDataLenght);
-
-    div.setAttribute("text", amount);
-    chart.appendChild(div);
-}
-
-
-
-
-function GetLastMonth(){
-
-	var today = new Date();
-	today.setDate(today.getDate() - 1);
-	var lastMonth = new Date();
-	lastMonth.setDate(today.getDate() - 30);
-
-	LoadStatData(LoadChartData, today, lastMonth);
-
-}
-
-function ReloadStatistic(){
-
-	var start = document.getElementById('start').value;
-	var end = document.getElementById('end').value;
-
-	if(end == undefined ||end == null ||start == undefined ||start == null){
-		return;
-	}
-	if(end < start)
-		return;
-
-
-	LoadStatData(LoadChartData, end, start);
-
-
-}
-
-document.onload = GetLastMonth();
-
-
-
-
-
-
-
- </script>
+</script>
+<script src="http://<%=IP%>:<%=PORT%>/file/js/statistic.js" type="text/javascript"></script>

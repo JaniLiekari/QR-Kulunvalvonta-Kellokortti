@@ -1,6 +1,9 @@
 <link rel="stylesheet" href="http://<%=IP%>:<%=PORT%>/file/css/main.css">
 
 
+
+
+
 <!-- PARIT APUFUNKTIOT NODE PUOLELLE. KÄYTETÄÄN ENNEN KUIN SIVU TOIMITETAAN --> 
 <!--- --------------------------------------------------------------------- -->
 
@@ -205,7 +208,7 @@ function GetMyShift(name){
 							return firstname + ' ' + lastname;
 						}
 
-					}%>
+					} %>
 
 
 					<!--- CLIENTIN NIMI --->
@@ -220,29 +223,44 @@ function GetMyShift(name){
 						<!--- CLIENTIN META TIEDOT --->
 						<tag id="<%= data[i]['firstname'] + data[i]['lastname'] + '.' + j %>-meta" data-i="<%= j %>" data-id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>" data-firstname="<%= data[i]['firstname'] %>" data-lastname="<%= data[i]['lastname'] %>" data-date="<%= data[0][j] %>" data-shift="<%= data[i]['shift']%>"></tag>
 
-						<!--- HOLDERI PÄIVÄN TIEDOILLE JA MUOKKAAMISELLE --->
+					
+						<!-- TAUSTA VÄRI -->
 
-						<% bgColor = "white";
-						var cwd = data[i]['days'][target][3];
+						<!-- #e2baa6 muokattu työpäiväksi -->
+						<!-- #cea7e2 muokattu vapaaksi -->
+						<!-- #8d96a3 aloituspäivää ei ohitettu -->
+
+
+						<% bgColor = "white"; 
+						var cwd = data[i]['days'][target][3]; 
 						var twd = data[i]['days'][target][4][data[i]['days'][target][5]];
-
-						if(cwd != twd){
-							if(cwd == true){
-								bgColor = "#e2baa6";
-							}else{
-								bgColor = "#cea7e2";
-							}
-						} %>
+						var TMP_CREATE = new Date(data[i]['days'][target][6]);
+						TMP_CREATE.setDate(TMP_CREATE.getDate() - 1);
+						var cd = TMP_CREATE <= new Date(data[i]['days'][target][0]);
 
 
+						/*if(new Date(data[i]['days'][target][0]) < new Date(2019, 4, 20)){
+							cd = true; 
+						}*/
+						if(cd){
+							if(cwd != twd){
+								if(cwd == true){
+									bgColor = "#e2baa6";
+								}else{
+									bgColor = "#cea7e2";
+								}
+							} 
+						}else{
+							bgColor = "#8d96a3";
+						}%>
 
 
+						<!--- HOLDERI PÄIVÄN TIEDOILLE JA MUOKKAAMISELLE --->
 						<td id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-day" class="table-block" style="background-color: <%= bgColor %>">
 						
 
 
 							<!--- MUOKKAIN --->
-
 							<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-editor" class="hidden">
 
 							 	<input id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-edit_in" type="time" name="intime" min="07:00" max="18:00"><br>
@@ -262,12 +280,11 @@ function GetMyShift(name){
 							<% var isActive = (data[i]['days'] == null || data[i]['days'][target] == null || data[i]['days'][target][0].getDate() != data[0][j].getDate() || data[i]['days'][target][0].getMonth() != data[0][j].getMonth() || data[i]['days'][target][0].getFullYear() != data[0][j].getFullYear()) ? false : true %>
 
 
-							<!--- TÄSTÄ ALKAAKIN SITTEN SELVITTELY, ONNEA MATKAAN! --->
-
+							<!--- TÄSTÄ ALKAAKIN SITTEN SELVITTELY, ONNEA MATKAAN! -->
 							<div style="cursor: pointer; position: relative; width: 100%; height: 100%;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-button" 
-																							<% if(privileges[0]){ %>
-																									onclick="ChangeUserInfo('<%= 
-																										data[i]['firstname'] + data[i]['lastname'] %>', <%= 
+																						  <% if(privileges[0]){ %>
+																									onclick="ChangeUserInfo('<%=    
+																										data[i]['firstname'] + data[i]['lastname'] %>', <%=
 																									j %>, '<% 
 																									if(isActive == true && data[i]['days'][target][1]){%><%= 
 																										('0' + data[i]['days'][target][1].getHours()).slice(-2) + ':' + ('0' + data[i]['days'][target][1].getMinutes()).slice(-2) %><%}
@@ -279,16 +296,25 @@ function GetMyShift(name){
 																									else{
 																										%><%
 																									}%>')
-																									<%}%>" class="<% if(data[i]['days'][target][3] != true){
+																									<%}%>" class="<% if(data[i]['days'][target][3] != true || bgColor == "#8d96a3"){
 																											%>Vapaa hidden<%
-																									}%>">
+									
+																									}%>"> 
+
+									<!-- NÄYTTÄÄ POISSA TAI VAPAA TEKSTIN -->  
+									<!-- JOS KÄVIJÄLLÄ KIRJAUTUMISTIETOA SILLOIN HIDDEN, MUUTOIN NÄYTTÄÄ POISSA JOS TYÖPÄIVÄ JA JOS ALOITUSPÄIVÄ ON PIENEMPI TAI YHTÄSUURI KUIN KYSEINEN PÄIVÄ , MUUTOIN VAPAA. -->
+									<!-- HUOM!!! POISSA KOHDASSA OIKEANPUOLEN IF LAUSEKE ON AINA TRUE KYSEESSÄ OLEVA PÄIVÄ ON PIENEMPI KUIN 20.5.2019 -->
+									<p style="margin-left: 20px;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-null" class="<% if((data[i]['days'][target][1] != null|| data[i]['days'][target][2] != null) && data[i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data[i]['days'][target][3] == true && (new Date(data[i]['days'][target][6]) <= new Date(data[i]['days'][target][0]))/* || ( new Date(data[i]['days'][target][0]) < new Date(2019, 4, 20)) */){%>Poissa<% }else{ %>Vapaa<% } %></p>  
 
 
-									<p style="margin-left: 20px;" id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-null" class="<% if((data[i]['days'][target][1] != null|| data[i]['days'][target][2] != null) && data[i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data[i]['days'][target][3] == true){%>Poissa<% }else{ %>Vapaa<% } %></p>
-
-
+									<!-- NÄYTTÄÄ KIRJAUTUMIS TIEDOT, JA INDIKAATTORI PALLON JOKA KERTOO SUORITTAMISEN TASOSTA! -->
+									<!-- JOS KÄVIJÄLLÄ EI OLE KIRJAUTUMISTIETOJA SILLOIN HIDDEN. --> 
 									<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-data" class="<% if(data[i]['days'][target][3] == false || (data[i]['days'][target][1] == null && data[i]['days'][target][2] == null)) { %>hidden<% } %>" style="position: relative; padding-left: 20px;">
-							 			<% var color; var b_color;
+
+
+
+										<!-- INDIKAATTORI PALLON VÄRIN TARKASTAMINE / VALITSEMINEN -->
+							 			<% var color; var b_color;  
 							 			if(isActive == true && data[i]['days'][target][1] != null && isActive == true && data[i]['days'][target][2] != null) {
 
 							 				var f1 = data[i]['days'][target][1]; var f2 = data[i]['days'][target][2];
@@ -304,9 +330,18 @@ function GetMyShift(name){
 							 				color = "yellow";
 							 				b_color = "#ffff84";
 							 			} %>
+
+
+							 			<!-- SISÄÄNKIRJAUTUMIS AIKA -->
  							 			<p id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-in">Sisään: <% if(isActive == true && data[i]['days'][target][1] != null) { %><%= ("0" + data[i]['days'][target][1].getHours()).slice(-2) + ":" + ("0" + data[i]['days'][target][1].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+
+ 							 			<!-- ULOSKIRJAUTUMIS AIKA -->
 							 			<p id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-out">Ulos: <% if(isActive == true && data[i]['days'][target][2] != null) { %><%= ("0" + data[i]['days'][target][2].getHours()).slice(-2) + ":" + ("0" + data[i]['days'][target][2].getMinutes()).slice(-2) %><% } else { %>Puuttuu<% } %></p>
+
 							 		</div>
+
+
+							 		<!-- INDIKAATTORI PALLO -->
 							 		<div id="<%= data[i]['firstname'] + data[i]['lastname'] + j %>-bubble" class="circle <%if(data[i]['days'][target][3] == false  || (data[i]['days'][target][1] == null && data[i]['days'][target][2] == null)){%>hidden<%}%>" style="background-color: <%= color %>; border-color:  <%= b_color %>;"></div>
 							 		<% if(isActive) target++; %> 
 
@@ -373,7 +408,7 @@ function GetMyShift(name){
 	<!-- ----------------------- -->
 
 
-
+<!-- MONI MUOKKAUS -->
 <div id="modifyMulti" class="modifyMulti hidden">
 	
 
@@ -400,7 +435,11 @@ function GetMyShift(name){
 					<p style="margin-bottom: 2px;">Ulos: </p>
 					<input id="modifyMulti-time_out" type="time" name="outtime" min="00:00" max="23:59">
 				</div>
-				<div style="float: right; bottom: 10px; right: 30px; position: absolute;">
+				<div style="float: left; margin-left: 10px;">
+					<p style="margin-bottom: 2px;">Vapaa: </p>
+					<input type="checkbox" id="setfreetoggle" name="setfree">
+				</div>
+				<div style="float: right; bottom: 10px; right: 20px; position: absolute;">
 					<button style="width: 120px; height: 35px;" onclick="multiEditSend();">Tallenna</button>
 				</div>
 
@@ -420,26 +459,10 @@ function GetMyShift(name){
 
 
 <button style="margin-left: 10px; margin-top: 10px; margin-bottom: 20px;" class="btn" onclick="print_and_submit()"><b>Avaa taulukko uudessa ikkunassa</b></button>
-
-<% if(plugins) { %>
-	<%for(var i = 0; i < plugins.length; i++){ %>
-		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
-
-			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
-
-				 <% if(hook[0] == "MainTable") { %>
-				 	<% if(hook[1] == "END_BEFORE_SCRIPT") { %>
-
-				 		<%- include(hook[2])%> 
-
-				 	<%}%>
-				 <%}%>
-
-			<%}%>
-
-		<%}%>
-	<%}%>
-<%}%>
+<% var hookUp = HookPlugin(plugins, "MainTable", "END_BEFORE_SCRIPT"); %>
+<% for(var i = 0; i < hookUp.length; i++){%>
+	<%- include(hookUp[i])%>
+<%}%>	
 
 
 <script type="text/javascript">
@@ -486,6 +509,7 @@ function GetMyShift(name){
 				var data_in = document.getElementById(name+""+day+"-in");
 				var outTime = document.getElementById("modifyMulti-time_out").value;
 				var inTime = document.getElementById("modifyMulti-time_in").value;
+				var free = document.getElementById("setfreetoggle").checked;
 
 				if(outTime == ""){
 
@@ -514,10 +538,9 @@ function GetMyShift(name){
 				}
 
 				
+				free = !free;
 
-
-
-				SaveData(name, day,inTime, outTime, document.getElementById(name+""+day+"-workday").checked);
+				SaveData(name, day,inTime, outTime, free);
 			}
 
 		}
@@ -574,7 +597,7 @@ function GetMyShift(name){
 
 
 				var wd = (document.getElementById(id+"-null").innerHTML == "Vapaa") ? false : true;
-
+				if(show == true){ wd = true; }
 				if(wd){
 
 					var isIn = true;//(document.getElementById(id+"-in").innerHTML == "Sisään: Puuttuu") ? false : true;
@@ -877,24 +900,10 @@ function GetMyShift(name){
 
 </script>
 
+<% var hookUp = HookPlugin(plugins, "MainTable", "END"); %>
+<% for(var i = 0; i < hookUp.length; i++){%>
+	<%- include(hookUp[i])%>
+<%}%>	
 
-<% if(plugins) { %>
-	<%for(var i = 0; i < plugins.length; i++){ %>
-		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
 
-			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
-
-				 <% if(hook[0] == "MainTable") { %>
-				 	<% if(hook[1] == "END") { %>
-				 	 
-				 		<%- include(hook[2])%> 
-
-				 	<%}%>
-				 <%}%>
-
-			<%}%>
-
-		<%}%>
-	<%}%>
-<%}%>
 

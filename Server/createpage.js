@@ -12,8 +12,23 @@ var Extented = require('./Extented.js');
 var GetAdmins = require('./models/admin').getNameList;
 const crypto = require('crypto');
 var Logger = require('./logger.js');
-
+var ServerConf = require('./models/config');
 var path = require('path');
+
+
+var AdminByName = require('./models/admin').getAccount;
+
+async function GetPageSettings(account, setting){
+	
+	var pageSettings;
+	var admin = await AdminByName(account);
+	console.log("ADMIN: " + admin);
+	pageSettings = admin[setting];
+
+	return pageSettings;
+
+}
+
 
 //Generating new unique QR Hash
 function createHash(){
@@ -49,13 +64,19 @@ function createHash(){
 //renders create view
 router.get('/', PrivilegesHandler.islogedIn, async function(req, res, error){
 		var privileges =  await PrivilegesHandler.GetPrivileges(req.session.username);
-
+		var CONFIG = await ServerConf.return();
+		var SHOWLOG =  await GetPageSettings(req.session.username, 'show_log') == true ? true : false;
 		var hash = createHash();
 		var shifts = await ShiftHandler.GetShifts();
 		var adminList = await GetAdmins();
 
 		
-		res.render("index", {action: "Admin", user: req.session.username, page: "create", qr: hash, message: "none", shifts: shifts, privileges: privileges, IP:Config.ip, PORT: Config.port, admins: adminList, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+		res.render("index", {action: "Admin", user: req.session.username, 
+							QRLOG: SHOWLOG, page: "create", qr: hash, 
+							message: "none", shifts: shifts, privileges: privileges, 
+							IP:Config.ip, PORT: Config.port, admins: adminList, 
+							plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+					});
 
 });
 
@@ -93,7 +114,17 @@ router.post('/', PrivilegesHandler.islogedIn, async function(req,res, error){
 	var response = [];
 	var workDays = JSON.parse(req.body.workDays);
 
+	var aloitus;
+	if(req.body.aloitus == undefined || req.body.aloitus == null || req.body.aloitus == ""){
+		aloitus = new Date();
+	}else{
+		aloitus = new Date(req.body.aloitus);
+	}
+	/* FIX TO BE SMALLER THAN TODAY */ aloitus.setMinutes(0); aloitus.setSeconds(1); aloitus.setHours(0);
 
+
+	console.log("RBA" + req.body.aloitus);
+	console.log("ALOITUS : " + aloitus);
 
 
 
@@ -107,23 +138,14 @@ router.post('/', PrivilegesHandler.islogedIn, async function(req,res, error){
 	_lastname = Extented.Uppercase(_lastname);
 
 
-	var exists = await accountExist(_firstname, _lastname);
-
-	if(exists){
+	var exists = await accountExist(_firstname, _lastname); 					/* VARMISTETAAN ETTEI LUODA TUPLA VERSIOITA KÄYTTÄJÄSTÄ (HAJOITTAA MUUTEN TIETOKANTAA, KUN OSA HAUISTA TIETOKANNASSA TEHDÄÄN NIMILLÄ) */
+																				/* TÄMÄN VOISI KORJATA KÄYMÄLLÄ LÄPI JOKAISEN KOHDAN KOODISTA JA TEKELLÄ HAUT VAIKKA QR AVAIMELLA */
+	if(exists){																	/* JOS NIMI OLEMASSA ---> */
 			response[0] = "failed";
 			response[1] = "exists";
 			res.send(JSON.stringify(response));
-			return;
+			return;																/* LOPETETAAN FUNKTIO TÄHÄN  <----- */ 
 	}
-
-
-	var file = req.session.username + '.txt';
-	var filepath = '/logs/';
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'-----Uuden kävijän luominen------', req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Kohde: ' +_firstname + " " + _lastname, req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Yksikkö: ' +_unit, req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Vuoro: ' +_shift, req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'---------Luominen loppu---------'  + '\r\n', req.session.username);
 
 	var new_client = new Client({
 		firstname: _firstname,
@@ -134,7 +156,7 @@ router.post('/', PrivilegesHandler.islogedIn, async function(req,res, error){
 		id: _id,
 		workDays: workDays,
 		vastuu: vast,
-		createDate: new Date()
+		createDate: aloitus
 	});
 
 	new_client.save(function(err){

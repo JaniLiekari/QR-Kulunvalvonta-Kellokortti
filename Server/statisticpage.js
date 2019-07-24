@@ -4,10 +4,23 @@ var PrivilegesHandler = require('./privileges');
 var Config = require('./config');
 
 var Client = require('./models/client').client;
-var Shift = require('./models/shifts').shift;
 
 var ShiftHandler = require('./models/shifts');
+var ServerConf = require('./models/config');
+var AdminByName = require('./models/admin').getAccount;
 
+async function GetPageSettings(account, setting){
+	
+	var pageSettings;
+	var admin = await AdminByName(account);
+	console.log("ADMIN: " + admin);
+	pageSettings = admin[setting];
+
+	return pageSettings;
+
+}
+
+/* POLUT ALIMPANA, SIELTÄ HYVÄ LÄHTEÄ AVAAMAAN */
 function ChartHeaders(headers, data){
 	this.headers = headers;
 	this.data = data;
@@ -27,7 +40,7 @@ function StatData(currentini,currentinb,currentino,Estimate,missing,clients){
 }
 
 
-
+/* Palauttaa kaikki käyttäjät */
 async function GetUsers(filter){
 
 	var ret = null;
@@ -35,17 +48,16 @@ async function GetUsers(filter){
 	await Client.find({}).exec().then((clients) => {
 		ret = clients;
 		if(clients && filter != null && filter != undefined && filter['shift'] != null && filter['shift'] != undefined){
-			var filtered = [];
-			for(var i = 0; i < clients.length; i++){
-				if(filter['shift'] != null && filter['shift'] != undefined){
-					if(clients[i]['shift'] == filter['shift']){
-						filtered.push(clients[i]);
-						console.log("FILTERED PUSH");
+				var filtered = [];
+				for(var i = 0; i < clients.length; i++){
+					if(filter['shift'] != null && filter['shift'] != undefined){
+						if(clients[i]['shift'] == filter['shift']){
+							filtered.push(clients[i]);
+						}
 					}
-				}
-			}
 
-			ret = filtered;
+				ret = filtered;
+			}
 		}
 		
 	});
@@ -54,24 +66,7 @@ async function GetUsers(filter){
 }
 
 
-function GetTimeBetween(Date1, Date2){
-	var diff = Math.abs(Date2 - Date1);
-	return diff;
-}
-
-async function getSingleShift(name){
-
-	var shift = null;
-
-
-	await Shift.findOne({name: name}).exec().then((s) =>{
-		shift = s;
-	});
-
-	return shift;
-
-}
-
+/* Tällä hetkellä kirjautuneet, pois kirjautuneen ja molemmat */
 function GetNowInUsers(today, users, type){
 
 	var day = today.getDate();
@@ -87,6 +82,7 @@ function GetNowInUsers(today, users, type){
 		for(var j = current['loggins'].length - 1; j >= 0; j--){
 
 			var loggin = current['loggins'][j];
+			/* Tässä sääntö */
 			if((type=="onlyLogin" && loggin['loginTime'] != null && loggin['logoutTime'] == null) || (type=="both" && loggin['loginTime'] != null) || (type=="onlyLogout" && loggin['loginTime'] != null && loggin['logoutTime'] != null) ){
 				var uDate = loggin['date'];
 				var uDay = uDate.getDate();
@@ -106,11 +102,12 @@ function GetNowInUsers(today, users, type){
 	return amount;
 }
 
-
-async function GetUsersAndLogins(users, today){
-	var day = today.getDate();
+/* Koko data kirjautumisista (Poissaolot, aloituspäivät etc..) */
+async function GetUsersAndLogins(users, today,filter){
+	var dateday = today.getDate();
 	var month = today.getMonth();
 	var year = today.getFullYear();
+
 
 	var usr = [];
 	var absence = [];
@@ -118,6 +115,7 @@ async function GetUsersAndLogins(users, today){
 
 		var current = users[i];
 		var dateFound = false;
+		var disapleCreation = filter != null ? filter['disapleCreation'] : false;
 
 		for(var j = current['loggins'].length - 1; j >= 0; j--){
 
@@ -127,23 +125,65 @@ async function GetUsersAndLogins(users, today){
 			var uMonth = uDate.getMonth();
 			var uYear = uDate.getFullYear();
 
-			if(uDay == day && uMonth == month && uYear == year){	
-				if(loggin['loginTime'] != null){
-						usr.push(current['firstname'] + " " + current['lastname']);
-				}else{
-					if(loggin['workDay'] == true){
-						absence.push(current['firstname'] + " " + current['lastname']);
-					}
-				}
 
-				dateFound = true;
+	
+
+
+			if(uDay == dateday && uMonth == month && uYear == year){
+				if(!disapleCreation || filter == null){	
+
+					if(loggin['loginTime'] != null){
+							usr.push(current['firstname'] + " " + current['lastname']);
+					}else{
+						var tempCreate = new Date(current['createDate']);
+						tempCreate.setDate(tempCreate.getDate() - 1);
+						tempCreate.setSeconds(59);
+						tempCreate.setHours(23);
+						tempCreate.setMinutes(59);
+						console.log("CREATE DATE: " + tempCreate);
+				
+						if(loggin['workDay'] == true){
+							absence.push(current['firstname'] + " " + current['lastname']);
+						}
+					}
+
+					dateFound = true;
+				}else{
+
+					var tempCreate = new Date(current['createDate']);
+					tempCreate.setDate(tempCreate.getDate() - 1);
+						tempCreate.setSeconds(59);
+						tempCreate.setHours(23);
+						tempCreate.setMinutes(59);
+
+					if(tempCreate <= uDate){
+						if(loggin['loginTime'] != null){
+							usr.push(current['firstname'] + " " + current['lastname']);
+						}else{
+							if(loggin['workDay'] == true){
+								absence.push(current['firstname'] + " " + current['lastname']);
+							}
+						}
+
+						
+					}
+					dateFound = true;
+				}
 			}
 
 		}
 
 		if(!dateFound){
 			var day = today.getDay();
-			if(current['workDays'][day] == true && current['createDate'] <= today){
+
+			var tempCreate = new Date(current['createDate']);
+			tempCreate.setDate(tempCreate.getDate() - 1);
+			tempCreate.setSeconds(59);
+			tempCreate.setHours(23);
+			tempCreate.setMinutes(59);
+		
+			console.log("CREATE DATE VS TODAY: " + tempCreate + " vs " + today);
+			if(current['workDays'][day] == true && ((disapleCreation && tempCreate <= today) || !disapleCreation )){
 				absence.push(current['firstname'] + " " + current['lastname']);
 			}
 		}
@@ -152,22 +192,23 @@ async function GetUsersAndLogins(users, today){
 	return [usr, absence];
 }
 
-async function UsersChart(start, end, clients){
+async function UsersChart(start, end, clients, filter){
 
 	var header = ["", "Kirjautumiset"];
 	var data = [];
 	
-	
 	while(end >= start){
 
-		end.setDate(end.getDate() - 1);
+
 		if(end.getDay() != 0 && end.getDay() != 6){
 
-			var temp = await GetUsersAndLogins(clients, end);
+			var temp = await GetUsersAndLogins(clients, end, filter);
 			var date = end.getDate() + "." + (end.getMonth() + 1 );
 			data.push(new UserChartData(date, temp[0], temp[1]));
 
 		}
+
+		end.setDate(end.getDate() - 1);
 
 	}
 
@@ -176,188 +217,74 @@ async function UsersChart(start, end, clients){
 	return new ChartHeaders(header, data);
 }
 
-function returnLastWeekFriday(date){
+async function GetEstimate(start, end, clients, filter){
 
+	var total = 0;
+	var missing = 0;
+	var curDate = new Date(start);
+		
+	while(end >= start){
+		if(end.getDay() != 0 && end.getDay() != 6){
 
-    var day = date.getDay();
-    var prevMonday;
-    if(date.getDay() == 0){
-        prevMonday = new Date();
-        prevMonday.setDate(date.getDate() - 7 + 5);
-    }
-    else{
-        prevMonday = new Date();
-        prevMonday.setDate(date.getDate() - day - 7 + 5);
-    }
-
-    return prevMonday;
-}
-
-
-async function GetWorkDayUserLoginTime(today, user){
-
-
-	var day = today.getDate();
-	var month = today.getMonth();
-	var year = today.getFullYear();
-
-
-	for(var j = user['loggins'].length - 1; j >= 0; j--){
-
-		var loggin = user['loggins'][j];
-
-		var uDate = loggin['date'];
-		var uDay = uDate.getDate();
-		var uMonth = uDate.getMonth();
-		var uYear = uDate.getFullYear();
-
-		console.log(loggin['workDay']);
-
-		if(uDay == day && uMonth == month && uYear == year){	
-			if(loggin['loginTime'] != null && loggin['logoutTime'] != null && loggin['workDay'] == true){
-				return GetTimeBetween(loggin['loginTime'], loggin['logoutTime']);
-			}else if(loggin['loginTime'] == null && loggin['workDay'] == true){
-					return 0;
-			}else if(loggin['loginTime'] != null && loggin['logoutTime'] == null && loggin['workDay'] == true){
-					return 0;
-			}else if(loggin['workDay'] == false){
-				return "false";
-			}
+			var temp = await GetUsersAndLogins(clients, end, filter);
+			console.log(end);
+			console.log(temp);
+			missing += temp[1].length;
+			total += temp[1].length + temp[0].length;
+		
 		}
+		end.setDate(end.getDate() - 1);
 
 	}
 
-	var day = today.getDay();
+	var prosentage = 1 - (missing / total);
 
-	if(user['workDays'][day] == true && user['createDate'] <= today){
-		return 0;
-	}
-
-	return "false";
-
-}
-
-function HasLoginData(today, user){
-
-	var day = today.getDate();
-	var month = today.getMonth();
-	var year = today.getFullYear();
-
-	var dataFound = false;
-	
-	for(var j = 0; j < user['loggins'].length; j++){
-
-		var loggin = user['loggins'][j];
-
-		var uDate = loggin['date'];
-		var uDay = uDate.getDate();
-		var uMonth = uDate.getMonth();
-		var uYear = uDate.getFullYear();
-
-		if(uDay == day && uMonth == month && uYear == year){
-			dataFound = true;
-			if((loggin['loginTime'] != null && loggin['workDay'] == true) || loggin['workDay'] == false){
-				return true;
-			}else{
-				return false;
-			}
-		}
-
-	}
-
-	if(!dataFound){
-
-		var day = today.getDay();
-		if(user["workDays"][day] == true && user['createDate'] <= today){
-			return false;
-		}
-
-	}
-
-
-	return true;
+	return Math.round(prosentage * 1000) / 10;
 }
 
 
-function shiftToTime(shift){
-	var h = parseInt(shift['hours']);
-	var m = parseInt(shift['minutes']);
 
-	var millisecond = (h * 3600000) + (m * 60000);
-	return millisecond;
-}
-
-async function GetEstimate(start, end, clients){
-
-	var estimate = [];
-
-	for(var i = 0; i < clients.length; i++){
-		var currentClient = clients[i];
-
-		var curDate = new Date(start);
-		while(curDate <= end){
-			
-			var time = await GetWorkDayUserLoginTime(curDate, currentClient);
-			console.log("TIME = " + time);
-			if(time != "false"){
-
-
-					var shift = await getSingleShift(currentClient['shift']);
-					
-					var h = parseInt(shift['hours']);
-					var m = parseInt(shift['minutes']);
-
-					var millisecond = (h * 3600000) + (m * 60000);
-					console.log("FILL RATE: " + time/millisecond);
-					estimate.push(time/millisecond);
-
-
-			}
-
-			curDate.setDate(curDate.getDate() + 1);
-
-		}
-
-	}
-
-	var est = 0;
-
-	for(var i = 0; i < estimate.length; i++){
-		est += estimate[i];
-	}
-
-
-	return Math.round((est/estimate.length) * 100.0);
-}
-
-var GetMissing = async function GetMissing(start, end,clients){
+var GetMissing = async function GetMissing(start, end,clients, filter){
 
 	var amount = 0;
-	console.log(clients.length);
-	for(var i = 0; i < clients.length; i++){
-		var currentClient = clients[i];
-		var curDate = new Date(start);
-		while(curDate <= end){
-			var data = HasLoginData(curDate, currentClient);
-			if(data === false){
-				amount += 1;
-			}
+	var curDate = new Date(start);
+		
+	while(end >= start){
 
-			curDate.setDate(curDate.getDate() + 1);
+		if(end.getDay() != 0 && end.getDay() != 6){
+
+			var temp = await GetUsersAndLogins(clients, end, filter);
+			console.log(end);
+			console.log(temp);
+			amount += temp[1].length;
+		
 		}
+		end.setDate(end.getDate() - 1);
 
 	}
-	console.log(amount);
 	return amount;
 }
 
 
+
+
+
+// RENDERÖI SIVUN.
 router.get('/', PrivilegesHandler.islogedIn, async function(req,res){
+
+
+	console.log("Statistiikka sivu renderöinti / ");
+
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
 	var shifts = await ShiftHandler.GetShifts();
+
+	var CONFIG = await ServerConf.return();
+	var SHOWLOG = await GetPageSettings(req.session.username, 'show_log') == true ? true : false;
+
 	res.render("index", {	user: req.session.username, 
 							page: "statistic", 
-							IP:Config.ip, 
+							IP:Config.ip,
+							QRLOG: SHOWLOG,
 							PORT: Config.port, 
 							privileges: privileges,
 							shifts: shifts,
@@ -366,9 +293,10 @@ router.get('/', PrivilegesHandler.islogedIn, async function(req,res){
 				);
 });
 
-
+//XMLHTTPREQUEST --> VASEMMAN PUOLINEN DATA.
 router.post('/stats', PrivilegesHandler.islogedIn, async function(req,res){
 
+	console.log("Ladataan sivupaneeli data");
 	
 	var startDay = new Date(req.body.startDay);
 	var endDay = new Date(req.body.endDay);
@@ -381,24 +309,32 @@ router.post('/stats', PrivilegesHandler.islogedIn, async function(req,res){
 	var clients = await GetUsers(filter);
 
 
-	var currentini = GetNowInUsers(new Date(), clients, "onlyLogin", filter);
-	var currentinb = GetNowInUsers(new Date(), clients, "both", filter);
-	var currentino = GetNowInUsers(new Date(), clients, "onlyLogout", filter);
- 	var Estimate = await GetEstimate(startDay, endDay, clients, filter);
- 	var missing = await GetMissing(startDay, endDay, clients, filter);
+	var currentini = GetNowInUsers(new Date(), clients, "onlyLogin", filter); //KÄVIJÖITÄ TÄLLÄ HETKELLÄ KIRJAUTUNEENA (EI ULOSKIRJATUT)
+	var currentinb = GetNowInUsers(new Date(), clients, "both", filter);      //KÄVIJÖITÄ KONAISMÄÄRÄISESTI TÄNÄÄN (MYÖS ULOSKIRJATUT)
+	var currentino = GetNowInUsers(new Date(), clients, "onlyLogout", filter);//JO ULOSKIRJAUTUNEET TÄNÄÄN
+ 	var Estimate = await GetEstimate(startDay, new Date(endDay), clients, filter);      //KESKIMÄÄRÄINEN SUORITUS PROSENTTI AJALTA startDay - endDay
+ 	var missing = await GetMissing(startDay, new Date(endDay), clients, filter);        //POISSAOLOT AJALTA startDay - endDay 
 
- 	var data = new StatData(currentini, currentinb, currentino, Estimate, missing, clients.length);
+ 	var data = new StatData(currentini, currentinb, currentino, Estimate, missing, clients.length); //TEHDÄÄN TIEDOISTA OBJEKTI JOTTA SE SAADAAN JSON:ksi
+ 	console.log("Data: " + data);
 	res.send(JSON.stringify(data));
 	
 });
 
 
-
+//XMLHTTPREQUEST --> CHART TAULUKKO DATA.
 router.post('/chartData',PrivilegesHandler.islogedIn, async function(req,res){
+
+	console.log("Ladataan kuvaajan data");
 
 	var startDay = new Date(req.body.startDay);
 	var endDay = new Date(req.body.endDay);
-	var data = await UsersChart(startDay, endDay, await GetUsers());
+	var filter = req.body.filter;
+	if(filter != null && filter != undefined){
+		filter = JSON.parse(filter);
+	}
+	var data = await UsersChart(startDay, endDay, await GetUsers(filter),filter); //CHART DATA (KIRJAUTUMISET/POISSAOLOT/NIMET/PÄIVÄT)
+	console.log("Data: " + data);
 	res.send(JSON.stringify(data));
 });
 

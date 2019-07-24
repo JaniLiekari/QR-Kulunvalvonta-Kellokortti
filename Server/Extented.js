@@ -25,6 +25,7 @@ module.exports.Uppercase = function Uppercase(word){
 }
 
 
+
 module.exports.createDateString = function createDateString(date){
 	var string = "";
 	string = date.getDate() + "."+(date.getMonth()+1)+"."+date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
@@ -32,6 +33,8 @@ module.exports.createDateString = function createDateString(date){
 }
 
 
+
+/* Luo heikon pseudorandom sha1 avaimen (ei jaksanut etsiä kunnollista crypto kirjastoa tähän projektiin, jo tämäkin on liioiteltua) */
 module.exports.wsKey = function wsKey(){
 
 	const crypto = require('crypto');

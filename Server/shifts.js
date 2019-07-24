@@ -10,11 +10,16 @@ var path = require('path');
 
 //Add new shift
 router.post('/add', PrivilegesHandler.islogedIn, async function(req,res,error){
+
+
 	var name = req.param('name');
 	var rqtime = req.param('rqTime');
 
 	var hours = rqtime.split(":")[0];
 	var minutes = rqtime.split(":")[1];
+
+
+	console.log("LUODAAN UUSI VUORO"+'\n'+"Vuoron nimi: " + name + '\n' + "Tavoiteaika: " + rqtime);
 
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
 
@@ -44,7 +49,11 @@ router.post('/add', PrivilegesHandler.islogedIn, async function(req,res,error){
 
 //Remove shift
 router.post('/remove', PrivilegesHandler.islogedIn, async function(req,res,error){
+
+	
+
 	var name = req.param('name');
+	console.log("Poistetaan vuoro " + name);
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
 
 	if(privileges[4] != true){

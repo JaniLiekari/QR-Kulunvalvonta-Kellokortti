@@ -1,6 +1,8 @@
 <% include ./css/pad-css.html %>
 <% include ./css/findbar-css.html %>
 
+
+
 <!--- HAKU VALIKKO --->
 <style type="text/css">
 	#print{
@@ -160,23 +162,11 @@ function Is4Hours(f1, f2){
 			<p style="<% if(vastuu == "Ei lisätty") { %> <%="color: red" %><%}%>"><b>Vastuuhenkilö: </b><%=vastuu%></p>
 			<% if(privileges[3] === true) { %><button class="btn" style="background-color: #39db59; height: 40px; border-radius: 10px; color: white; padding-left: 10px; padding-right: 10px; border: 1px solid green;" onclick="editUser('<% if (data != null ) { %><%= data['qr'] %><% } %>');"><b>Muokkaa kävijää</b></button> <% } %>
 
-
-			<% if(plugins) { %>
-				<%for(var i = 0; i < plugins.length; i++){ %>
-				 	<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
-
-				 		<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
-
-				 			<% if(hook[0] == "Modify-client") { %>
-				 					<% if(hook[1] == "CLIENT_ACTIONS") { %> 
-				 						<%- include(hook[2])%> 
-				 					<% } %>
-				 			<%	} %>
-				 		<% } %>
-				 	<% } %>
-				<%	} %>
-			<% } %>
-
+			<% var hookUp = HookPlugin(plugins, "Modify-client", "CLIENT_ACTIONS"); %>
+			<% for(var i = 0; i < hookUp.length; i++){%>
+				<%- include(hookUp[i])%>
+			<%}%>	
+			
 			<% if(privileges[2] === true) { %> <button class="btn btn-danger" onClick="RemoveUser();"><b>Poista käyttäjä!</b></button> <% } %>
 		</div>
 	</div>
@@ -233,7 +223,35 @@ function Is4Hours(f1, f2){
 					<tr>
 						 <% var target = 0; for(var j = 0; j < data['loggin'][0].length; j++) { %>
 							<tag id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + '.' + j %>-meta" data-firstname="<%= data['loggin'][i]['firstname'] %>" data-lastname="<%= data['loggin'][i]['lastname'] %>" data-date="<%= data['loggin'][0][j] %>" />
-						 	<td id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-day" style="border-top: 3px solid black;<%if(target != 0 ){ %>border-left: 2px solid black;<%}%>">
+
+
+							<%var bgColor = "white";
+							var cwd = data['loggin'][i]['days'][target][3];
+							var twd = data['loggin'][i]['days'][target][6][data['loggin'][i]['days'][target][4]];
+							var TMP_CREATE = new Date(data['loggin'][i]['days'][target][5]);
+							TMP_CREATE.setDate(TMP_CREATE.getDate() - 1);
+							var cd = TMP_CREATE <= new Date(data['loggin'][i]['days'][target][0]);
+							console.log("CWD: " + cwd);
+							console.log("TWD: " + data['loggin'][i]['days'][target][4]);
+
+
+							if(new Date(data['loggin'][i]['days'][target][0]) < new Date(2019, 4, 20)){
+								cd = true;
+							}
+							if(cd){
+								if(cwd != twd){
+									if(cwd == true){
+										bgColor = "#e2baa6";
+									}else{
+										bgColor = "#cea7e2";
+									}
+								} 
+							}else{
+								bgColor = "#8d96a3";
+							} %>
+
+
+						 	<td id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-day" style="background-color: <%= bgColor %>; border-top: 3px solid black;<%if(target != 0 ){ %>border-left: 2px solid black;<%}%>">
 						 		<div id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-editor" class="hidden">
 
 							 		<input id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-edit_in" type="time" name="intime" min="07:00" max="18:00"><br>
@@ -247,11 +265,11 @@ function Is4Hours(f1, f2){
 							 		<button style="border: none; background-color: #39db59;  border-radius: 5px; height: 25px;" onclick="EditDone('<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] %>', <%= j %>)"><b>Valmis!</b></button>
 
 								</div>
-						 		<div style="cursor: pointer; position: relative" id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-button" onclick="ChangeUserInfo('<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] %>', <%= j %>, '<% if(data['loggin'][i]['days'][target][1]){%><%= ('0' + data['loggin'][i]['days'][target][1].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][1].getMinutes()).slice(-2) %><%}else{%><%}%>', '<% if(data['loggin'][i]['days'][target][2]){%><%= ('0' + data['loggin'][i]['days'][target][2].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][2].getMinutes()).slice(-2) %><%}else{%><%}%>')" class="<%if(data['loggin'][i]['days'][target][3] != true){%>Vapaa hidden<%}%>">
+						 		<div style="cursor: pointer; position: relative" id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-button" onclick="ChangeUserInfo('<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] %>', <%= j %>, '<% if(data['loggin'][i]['days'][target][1]){%><%= ('0' + data['loggin'][i]['days'][target][1].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][1].getMinutes()).slice(-2) %><%}else{%><%}%>', '<% if(data['loggin'][i]['days'][target][2]){%><%= ('0' + data['loggin'][i]['days'][target][2].getHours()).slice(-2) + ':' + ('0' + data['loggin'][i]['days'][target][2].getMinutes()).slice(-2) %><%}else{%><%}%>')" class="<%if(data['loggin'][i]['days'][target][3] != true  || bgColor == '#8d96a3'){%>Vapaa hidden<%}%>">
 
 						 			<% console.log("DATA: " + data['loggin'][i]['days'][target]) %>
 
-						 			<p id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-null" class="<% if((data['loggin'][i]['days'][target][1] != null|| data['loggin'][i]['days'][target][2] != null) && data['loggin'][i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data['loggin'][i]['days'][target][3] == true){%>Poissa<% }else{ %>Vapaa<% } %></p>
+						 			<p id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-null" class="<% if((data['loggin'][i]['days'][target][1] != null|| data['loggin'][i]['days'][target][2] != null) && data['loggin'][i]['days'][target][3] == true) { %>hidden<% } %>"><% if(data['loggin'][i]['days'][target][3] == true /* && (new Date(data['loggin'][i]['days'][target][5]) <= new Date(data['loggin'][i]['days'][target][0]) ||  new Date(data['loggin'][i]['days'][target][0]) < new Date(2019, 4, 20)) */  ){ %>Poissa<% }else{ %>Vapaa<% } %></p>
 
 							 		<div id="<%= data['loggin'][i]['firstname'] + data['loggin'][i]['lastname'] + j %>-data" style="position: relative; padding-left: 20px" class="<% if(data['loggin'][i]['days'][target][3] == false || (data['loggin'][i]['days'][target][1] == null && data['loggin'][i]['days'][target][2] == null)) { %>hidden<% } %>">
 
@@ -287,25 +305,12 @@ function Is4Hours(f1, f2){
 </div>
 <button style="margin-left: 10px; margin-top: 10px; margin-bottom: 20px; background-color: #39db59; color: white;" class="btn <% if (data == null ) { %> hidden <% } %>" onclick="print_and_submit()"><b>Avaa taulukko uudessa ikkunassa</b></button>
 
-<% if(plugins) { %>
-	<%for(var i = 0; i < plugins.length; i++){ %>
-		<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
 
-			<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
 
-				 <% if(hook[0] == "Modify-client") { %>
-				 	<% if(hook[1] == "TABLE_BTN") { %>
-
-				 		<%- include(hook[2])%> 
-
-				 	<%}%>
-				 <%}%>
-
-			<%}%>
-
-		<%}%>
-	<%}%>
-<% } %>
+<% var hookUp = HookPlugin(plugins, "TABLE_BTN", "END"); %>
+<% for(var i = 0; i < hookUp.length; i++){%>
+	<%- include(hookUp[i])%>
+<%}%>	
 <!-------------------->
 
 
@@ -341,6 +346,16 @@ function Is4Hours(f1, f2){
 						<%}%>
 					<%}%>
   					</select>
+  		 	</div>
+
+
+  		 	<div style="margin-top: 20px;">
+  		 		
+  		 		<p style="font-weight: 700; margin-bottom: 3px;">Aloituspäivä:</p>
+  		 		<% var CD = new Date(CREATEDATE); 
+  		 		CD = CD.toISOString().slice(0,10); %>
+   		 		<input id="CREATEDATE-INPUT" class="form-control col-6" style="font-weight: 700; color: black;" type="date" value="<%= CD %>" />
+
   		 	</div>
 
 
@@ -402,6 +417,8 @@ var bar = document.getElementById('findbar');
 var show = false;
 
 
+
+
 function HideShowVapaa(btn){
 	var vapaat = document.getElementsByClassName('Vapaa');
 	for(var i = 0; i < vapaat.length; i++){
@@ -430,6 +447,15 @@ function saveUserEdit(qr){
 	var shift = document.getElementById('shift2')
 	var shiftvalue = shift.options[shift.selectedIndex].value;
 	var vastuu = document.getElementById('vastuuhenk');
+	var CD = document.getElementById('CREATEDATE-INPUT').value;
+	<% if(data != null) { %>
+
+		if(CD == null || CD == undefined){
+			CD = new Date("<%= CREATEDATE %>");
+		}
+
+	<% } %>
+
 	vastuu = vastuu.options[vastuu.selectedIndex].value;
 
 	var workDays = [];
@@ -445,7 +471,7 @@ function saveUserEdit(qr){
 
 	var request =  new XMLHttpRequest();
 	var url = 'http://<%=IP%>:<%=PORT%>/admin/client/mod';
-	var params='qr='+qr+'&fname='+fname+'&lname='+lname+'&shift='+shiftvalue + "&workDays="+workDays + "&vastuu="+vastuu;
+	var params='qr='+qr+'&fname='+fname+'&lname='+lname+'&shift='+shiftvalue + "&workDays="+workDays + "&vastuu="+vastuu +"&createDate="+CD;
 	request.open("POST", url,true);
 	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
@@ -680,18 +706,9 @@ function EditDone(user, day){
 
 <% include ./scripts/print.html %>
 
-<% if(plugins) { %>
-	<%for(var i = 0; i < plugins.length; i++){ %>
-	 	<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true) { %> 
 
-	 		<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
+<% var hookUp = HookPlugin(plugins, "Modify-client", "END"); %>
+<% for(var i = 0; i < hookUp.length; i++){%>
+	<%- include(hookUp[i])%>
+<%}%>	
 
-	 			<% if(hook[0] == "Modify-client") { %>
-	 					<% if(hook[1] == "END") { %> 
-	 						<%- include(hook[2])%> 
-	 					<% } %>
-	 			<%	} %>
-	 		<% } %>
-	 	<% } %>
-	<%	} %>
-<% } %>

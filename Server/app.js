@@ -1,11 +1,13 @@
+/* OSA NPM PAKETEISTA TULEE VALMIIKSI NODEJS:N MUKANA */
+
 const bodyParser = require('body-parser')
-const express = require('express')
+const express = require('express') // https://expressjs.com/
 const app = express()
 
 
 
-const mongoose = require('mongoose')
-const Jade = require('ejs')
+const mongoose = require('mongoose') // https://mongoosejs.com/
+const Jade = require('ejs') // https://ejs.co
 const crypto = require('crypto');
 
 const config = require('./config');
@@ -21,7 +23,7 @@ var GetShifts = require("./models/shifts").GetShifts;
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/public')) // Julkinen polku.. Ei tarvitse erikseen tehdä app.post/get jne funktioita. Kaikki /public kansiossa on avointa.
 
 app.use('/admin', admin.router);
 
@@ -35,7 +37,37 @@ mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 
 
-var webSocketJS = require('./websocket.js');
+var webSocketJS = require('./websocket.js'); // --> Sisältää NPM websocket --> https://www.npmjs.com/package/websocket
+
+/* HELPPERI EJS KOODILLE PLUGINIEN YHDISTÄMISEKSI HTML TIEDOSTOIHIN */
+/* VOIDAAN KUTSUA HTML TIEDOSTOSTA <% var Hooks = HookPlugin(plugins, "Nimi", "Kohta") %> */
+/* LISÄÄ EJS:stä ---> https://ejs.co */
+
+app.locals.HookPlugin = function HookPlugin(plugins, PageName, Placement){
+	var List = [];
+	if(plugins){
+		for(var i = 0; i < plugins.length; i++){
+			if(plugins[i].Hooks != null && plugins[i].Hooks != undefined && plugins[i].Temp[0] == true){
+				for(var j = 0; j < plugins[i].Hooks.length; j++){
+					var hook = plugins[i].Hooks[j];
+					if(hook[0] == PageName){
+						if(PageName != "ROUTE" && PageName != "Navbar"){
+							if(hook[1] == Placement){ 
+								List.push(hook[2]);
+							}
+						}else{
+							List.push(hook[1]);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return List;
+}
+
+/* ************************************************************** */
 
 
 function Clean(){
@@ -51,13 +83,17 @@ function Clean(){
 }
 
 
-
+console.log('\n'+"WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
+console.log("WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
+console.log("WARNING! AUTO CLEAN ON! RUNNING ONCE IN DAY");
 Clean();
 admin.clean();
 admin.setUp();
 
 
-function jsonObject(status, date, firstname, lastname, loggedin, timebetween, done){
+
+
+function jsonObject(status, date, firstname, lastname, loggedin, timebetween, done, pluginData){
 	this.status = status;
 	this.time = date;
 	this.firstname = firstname;
@@ -65,6 +101,7 @@ function jsonObject(status, date, firstname, lastname, loggedin, timebetween, do
 	this.loggedin = loggedin;
 	this.timebetween = timebetween;
 	this.daydone = done;
+	this.pluginData = pluginData;
 }
 
 app.route('/')
@@ -79,6 +116,8 @@ function SendResponseI(message, res){
 	res.end();
 }
 
+
+/* LUKULAITE KUTSUU TÄTÄ ----> VOISI SIIRTÄÄ TOISEEN POLKUUN */
 app.route('/api')
 
 	.get(function (req, res) {
@@ -93,10 +132,13 @@ app.route('/api')
 			return;
 		}
 		try{
+			/* ETSITÄÄN LÄHETETTY QR DATABASESTA */
 			Client.findOne({ 'id': qr }, async function (err, person) {
 				
 				var dateToFind = null;
 				var flag = false;
+
+				/* Tarkistetaan ettei erroria tai jos käyttäjää ei löydy */
 		  		if (err){
 		  			console.log(err);
 		  			res.send(JSON.stringify(new jsonObject("404","","", "", "")));
@@ -108,11 +150,15 @@ app.route('/api')
 		  			res.send(JSON.stringify(new jsonObject("404","","", "", "")));
 		  			return;
 		  		}
-		  		console.log("Name: " +  person['firstname'])
+		  		/********************************************************/
+
+
+		  		console.log("LUKULAITE KIRJAUTUMINEN (NIMI): " +  person['firstname']);
 
 		  		var added = false;
 
-		  		if(person['loggedin'] === false){
+		  		/* JOS KÄVIJÄ EI OLE MERKATTU KIRJAUTUNEEKSI ( ON TEHNYT ULOSKIRJAUTUMISEN ) */
+		  		if(person['loggedin'] === false){ 
 
 		  			console.log("Person was not loggedin");
 
@@ -121,7 +167,8 @@ app.route('/api')
 		  			today.setMinutes(0);
 		  			today.setSeconds(1);
 
-		  			if(person['loggins'] != null && person['loggins'].length > 0){
+		  			/* JOS KÄVIJÄLLÄ ON KIRJAUTUMISTIETOJA */
+		  			if(person['loggins'] != null && person['loggins'].length > 0){ 
 		  				var found = false;
 		  				for(var i = 0; i < person['loggins'].length; i++){
 
@@ -129,11 +176,13 @@ app.route('/api')
 		  					if(log == undefined || log == null){
 		  						break;
 		  					}
+
+		  					/* JOS KÄVIJÄLLÄ ON KIRJAUTUMISTIETOJA TÄNÄPÄIVÄNÄ */
 		  					if(log['date'].getFullYear() == today.getFullYear() && log['date'].getMonth() == today.getMonth() && log['date'].getDate() == today.getDate()){
 		  						console.log('not loged in, but date found');
 
-
-		  						if(log['workDay'] == true){
+		  						/* JOS TÄMÄ PÄIVÄ ON TYÖPÄIVÄ */
+		  						if(log['workDay'] == true){  
 			  						if(log['loginTime'] == undefined || log['loginTime'] == undefined ||log['loginTime'] == ""){
 			  							log['loginTime'] = new Date();
 			  							person['loggedin'] = true;
@@ -144,7 +193,9 @@ app.route('/api')
 			  						
 			  						dateToFind = log;
 			  						added = true;
-		  						}else{
+		  						}
+		  						/* JOS TÄMÄ PÄIVÄ ON VAPAA */
+		  						else{
 		  							flag = true;
 		  							webSocketJS.BoardCast("02:" + person['firstname'] + " " + person['lastname']);
 		  							SendResponseI('OTA YHTEYS VASTUU HENKILÖÖN! [EI TYÖPÄIVÄÄ]', res);
@@ -153,16 +204,21 @@ app.route('/api')
 		  					}
 		  				}
 
-		  			}else{
+		  			}
+		  			/* JOS KÄVIJÄLLÄ EI OLE KIRJAUTUMISTIETOJA */
+		  			else{
 		  				console.log('not loged in, but date not found');
 		  				person['loggedin'] = true;
 		  				added = true;
 		  				console.log("	Login time: " + new Date());
 		  				var day = today.getDay();
+		  				/* JOS TÄMÄ PÄIVÄ ON TYÖPÄIVÄ */
 		  				if(person['workDays'][day] == true){
 		  					dateToFind = new Login({ date: today, loginTime: new Date(), workDay: true});
 		  					person['loggins'].push(dateToFind);
-		  				}else{
+		  				}
+		  				/* JOS TÄMÄ PÄIVÄ ON VAPAA */
+		  				else{
 		  					flag = true;
 		  					webSocketJS.BoardCast("02:" + person['firstname'] + " " + person['lastname']);
 		  					SendResponseI('OTA YHTEYS VASTUU HENKILÖÖN! [EI TYÖPÄIVÄÄ]', res);
@@ -170,7 +226,11 @@ app.route('/api')
 		  				}
 			  			
 		  			}
-		  		}else{
+		  		}
+		  		/* JOS KÄVIJÄ ON MERKATTU KIRJAUTUNEEKSI ( EI OLE KIRJAUTUNUT TAI ON EDELLISENÄ PÄIVÄNÄ JÄTTÄNYT ULOSKIRJAUTUMATTA ) */
+		  		else{
+
+		  			/* JOS KÄVIJÄLLÄ ON KIRJAUTUMISTIETOJA */
 		  			if(person['loggins'] != null && person['loggins'].length > 0){
 			  			var p_date = person['loggins'][person['loggins'].length-1]['date'];
 			  			p_date.setHours(0);
@@ -190,10 +250,12 @@ app.route('/api')
 		  					if(log == undefined || log == null){
 		  						break;
 		  					}
+		  					/* JOS KÄVIJÄLLÄ ON KIRJAUTUMISTIETOJA TÄNÄPÄIVÄNÄ */
 		  					if(log['date'].getFullYear() == today.getFullYear() && log['date'].getMonth() == today.getMonth() && log['date'].getDate() == today.getDate()){
 
 
 		  						console.log('loged in, but date found');
+		  						/* JOS TÄMÄ PÄIVÄ ON TYÖPÄIVÄ */
 		  						if(log['workDay'] == true){
 			  						if(log['loginTime'] == null || log['loginTime'] == undefined || log['loginTime'] == ""){
 			  							log['loginTime'] = new Date();
@@ -205,7 +267,9 @@ app.route('/api')
 
 			  						added = true;
 			  						dateToFind = log;
-		  						}else{
+		  						}
+		  						/* JOS TÄMÄ PÄIVÄ ON VAPAA */
+		  						else{
 				  					flag = true;
 				  					webSocketJS.BoardCast("02:" + person['firstname'] + " " + person['lastname']);
 				  					SendResponseI('OTA YHTEYS VASTUU HENKILÖÖN! [EI TYÖPÄIVÄÄ]', res);
@@ -215,20 +279,25 @@ app.route('/api')
 		  					}
 		  				}
 
-		  			}else{
-
+		  			}
+		  			/* JOS KÄVIJÄLLÄ EI OLE KIRJAUTUMISTIETOJA */
+		  			else{
 		  				console.log('loged in, but date not found');
 		  				var today = new Date();
 			  			today.setHours(3);
 			  			today.setMinutes(0);
 			  			today.setSeconds(1);
 			  			var day = today.getDay();
+
+			  			/* JOS TÄMÄ PÄIVÄ ON TYÖPÄIVÄ */
 		  				if(person['workDays'][day] == true){
 			  				person['loggedin'] = true;
 			  				dateToFind = new Login({ date: today, loginTime: new Date(), workDay: true});
 				  			person['loggins'].push(dateToFind);
 				  			added = true;
-			  			}else{
+			  			}
+			  			/* JOS TÄMÄ PÄIVÄ ON VAPAA */
+			  			else{
 			  				flag = true;
 			  				webSocketJS.BoardCast("02:" + person['firstname'] + " " + person['lastname']);
 		  					SendResponseI('OTA YHTEYS VASTUU HENKILÖÖN! [EI TYÖPÄIVÄÄ]', res);
@@ -238,6 +307,7 @@ app.route('/api')
 		  			
 		  		}
 
+		  		/* JOS PÄIVÄÄ EI SAATU LISÄTTYÄ */
 		  		if(added == false){
 		  			console.log('date no added');
 		  			var today = new Date();
@@ -245,13 +315,14 @@ app.route('/api')
 			  			today.setMinutes(0);
 			  			today.setSeconds(1);
 
-
+			  		/* LUODAAN PÄIVÄ JOS TÄNÄÄN TYÖPÄIVÄ */
 			  		if(person['workDays'][today.getDay()] == true){
 				  		person['loggedin'] = true;
 			  			dateToFind = new Login({ date: today, loginTime: new Date(), workDay: true});
 				  		person['loggins'].push(dateToFind);
 				  		person['loggedin'] = true;
-			  		}else{
+			  		}
+			  		else{
 			  			flag = true;
 			  			webSocketJS.BoardCast("02:" + person['firstname'] + " " + person['lastname']);
 			  			SendResponseI('OTA YHTEYS VASTUU HENKILÖÖN! [EI TYÖPÄIVÄÄ]', res);
@@ -259,6 +330,9 @@ app.route('/api')
 			  		}
 
 		  		}
+
+		  		
+		  		/* LIPPU EI NOUSSUT, ELI KAIKKI HYVIN. SHORTATAAN PÄIVÄ TIEDOT JA TALLENNETAAN. LÄHETETÄÄN MYÖS ONNISTUNUT RESPONSE */
 		  		if(flag == false){
 			  		person['loggins'].sort(function(a,b){
 				  			return a['date'] - b['date'];
@@ -307,8 +381,17 @@ app.route('/api')
 			  			}
 			  		}
 
+			  		/* GET PLUGIN DATA */
 
-			  		res.send(JSON.stringify(new jsonObject("ok",d,person['firstname'], person['lastname'], status, timebetween, done)));
+			  		var pluginData = [];
+			  		for(var i = 0; i < admin.APIPlugin.length; i++){
+			  			pluginData.push(await admin.APIPlugin[i](person));
+			  		}
+
+			  		var pluginData = JSON.stringify(pluginData);
+
+
+			  		res.send(JSON.stringify(new jsonObject("ok",d,person['firstname'], person['lastname'], status, timebetween, done, pluginData)));
 		  		}
 
 			});
@@ -325,10 +408,7 @@ app.route('/*')
 	})
 
 
+console.log('\nServer is up and running on port 6060...\n');
 app.listen(config.port);
-
-
-
-
 
 

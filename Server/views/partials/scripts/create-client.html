@@ -33,8 +33,10 @@ function submit(callback){
 	var shift = document.getElementById('shift2');
 	var hidden_qr = document.getElementById('hidden_qr');
 	var message = document.getElementById('success');
+	var startDate = document.getElementById('aloitus').value;
+	
+	if(startDate == null || startDate == ""){ startDate = new Date(); }
 	message.classList.toggle('hidden', false);
-
 	if(firstname.value == "" || lastname.value == "" || unit.value == "" || shift.options[shift.selectedIndex].value == "" || hidden_qr.value == ""){
 		message.classList.toggle('hidden', true);
 		var message2 = document.getElementById('failed');
@@ -60,7 +62,7 @@ function submit(callback){
 
 	var request =  new XMLHttpRequest();
 	var url = 'http://<%=IP%>:<%=PORT%>/admin/create';
-	var params='firstname='+firstname.value+"&lastname="+lastname.value + "&unit="+unit.value+"&shift="+shift.options[shift.selectedIndex].value+"&_id="+hidden_qr.value+"&workDays="+workDays;
+	var params='firstname='+firstname.value+"&lastname="+lastname.value + "&unit="+unit.value+"&shift="+shift.options[shift.selectedIndex].value+"&_id="+hidden_qr.value+"&workDays="+workDays + "&aloitus="+startDate;
 	request.open("POST", url,true);
 	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 

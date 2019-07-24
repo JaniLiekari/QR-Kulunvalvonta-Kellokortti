@@ -7,8 +7,10 @@
 	</head>
 	<script src="http://<%=IP%>:<%=PORT%>/file/js/jquery-3.3.1.js" type="text/javascript"></script>
 	<body>
-		<% if(user) { %>
 
+			<!-- SIVUJEN HALLINTA -->
+
+		<% if(user) { %>
 			<% include ./partials/menu.html %>
 			<% if(page === "main") { %>
 					<% include ./partials/main.html %>
@@ -22,26 +24,26 @@
 					<% include ./partials/statistic.html %>
 			<% } else { %>
 
+					<!-- PLUGIN HOOK -->
 
-				<% if(plugins) { %>
-					<%for(var i = 0; i < plugins.length; i++){ %>
-					 	<% if(plugins[i].Hooks != null && plugins[i].Hooks != undefined) { %> 
+					<% var hookUp = HookPlugin(plugins, "ROUTE", ""); %>
+					<% for(var i = 0; i < hookUp.length; i++){%>
+							<%- include(hookUp[i])%>
+					<%}%>
 
-					 		<% for(var j = 0; j < plugins[i].Hooks.length; j++){ var hook = plugins[i].Hooks[j]; %>
-
-					 			<% if(hook[0] == "ROUTE") { %>
-					 					<%- include(hook[1])%> 
-					 			<%	} %>
-					 		<% } %>
-					 	<% } %>
-					<%	} %>
-				<% } %>
+					<!-- ----------- -->	
 
 			<%}%>
-				<% include ./partials/WEBSOCKET/ws.html %>
+				<% if(QRLOG == true){ %> 
+					<% include ./partials/WEBSOCKET/ws.html %>
+				<% } %>
 		<%  } else { %>
 			<% include ./partials/logsite.html %>
 		<% } %>
+
+			<!-- ------------ --->
+
+
 
 
 	</body>

@@ -6,20 +6,25 @@ var AdminModel = require('./models/admin');
 var wsReader = null;
 
 
+/* Funktiota voi käyttää originin tunnistamiseen. Nyt sallii kaikki originit */
 function originIsAllowed(origin) {
   return true;
 }
 
+/* Luodaan uusi yhteyspiste */
 var server = http.createServer(function(request, response) {
         console.log((new Date()) + ' Received request for ' + request.url);
         response.writeHead(404);
         response.end();
 });
 
+/* Avataan yhteys ( PORTTI ---> 3330 ) */
 server.listen(3330, function() {
         console.log((new Date()) + ' Server is listening on port 3330');
 });
 
+
+/* Luodaan uusi websocket objecti */
 wsServer = new WebSocketServer({
         httpServer: server,
         // You should not use autoAcceptConnections for production
@@ -30,7 +35,7 @@ wsServer = new WebSocketServer({
         autoAcceptConnections: false
 });
 
-
+/* Lähettää kaikille yhdistetyille clienteille viestin (UTF) */
 var BoardCast = function BoardCast(message){
     for(var i = 0; i < wsClients.length; i++){
         if(wsClients[i][0] == "Client" && wsClients[i][2] == true){
@@ -43,36 +48,33 @@ module.exports.BoardCast = BoardCast;
 
 
 wsServer.on('request', function(request) {
-    console.log("New Request");
-    if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin
+    console.log("Uusi websocket pyyntö");
+    if (!originIsAllowed(request.origin)) { /* Jos origin ei ole sallittu yhteys hylätään*/
       request.reject();
       console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
       return;
     }
     console.log("ORIGIN: "+request.origin);
-    //request.accept();
     var connection = request.accept('echo-protocol', request.origin);
-    connection.on('message', async function(message) {
+    connection.on('message', async function(message) { /* Kun wsClient lähettää viestin */
         console.log("MESSAGE TYPE: "+message.type);
         if (message.type === 'utf8') {
-            console.log(message.utf8Data);
-            if(message.utf8Data == "Reader"){
+            console.log("Viesti: " + message.utf8Data);
+
+            /* Tarkisetaan onko kyseessä lukija vai admin käyttäjä */
+            if(message.utf8Data == "Reader"){ 	// Lukija
 
                 console.log("HELLO WORLD");
                 wsReader = connection;
-                BoardCast('04:xx');
+                BoardCast('04:xx'); // Kun lukulaite yhdistyy lähetetään kaikille admin käyttäjille viesti '04:xx'.
             }
-            else{
+            else{								// Admin
 
                 var split = message.utf8Data.split(',');
 
-                var bool = await AdminModel.wsKeyValidate(split[0], split[1]);
-
-                console.log("BOOL: " + bool);
-                console.log("Name: " + split[0]);
-                console.log("Key: " + split[1]);
-
+                var bool = await AdminModel.wsKeyValidate(split[0], split[1]); // Tarkistaa admin käyttäjän ws avaimen oikeellisuuden. Avainta tarvitaan ws yhteyden lukemiseen / seuraamiseen.
+                															   // Yhteyden voi myös katkaista jos ws avain on epäkelvollinen. Nyt olen tyytynyt vain poistamaan tuon käyttäjän viestilistalta (merkkaamaan että avain ei kelpaa).
+                															   // Ws avain löytyy tiedostosta /Extend.js --> function wsKey()
 
                 var data = [];
                
@@ -81,25 +83,28 @@ wsServer.on('request', function(request) {
                 data.push(bool);
 
                 wsClients.push(data);
-                if(wsReader == null && bool == true){
-                    connection.sendUTF('03:xx');
+                if(wsReader == null && bool == true){ // Jos lukulaite ei ole yhteydessä tähän ws serveriin lähetetään kaikille admin käyttäjille viesti '03:xx'.
+                    connection.sendUTF('03:xx'); 
                 }
             }
         }
     });
-    connection.on('close', function(reasonCode, description) {
+    connection.on('close', function(reasonCode, description) { /* Kun wsClient sulkee yhteyden */
         var type = ReturnConnectionType(connection);
         if(type == "Client"){
-            console.log("client_close");
+            console.log("Websocket yhteys katkaistu clientiltä");
             RemoveClientFromArr(connection);
 
         }else{
-            BoardCast('03:xx');
+        	console.log("Websocket yhteys katkaistu lukulaitteelta");
+            BoardCast('03:xx'); // Jos lukulaite sulkee yhteyden lähetetään kaikille admin käyttäjille viesti '03:xx'.
             wsReader = null;
         }
     });
 });
 
+
+/* Palauttaa tiedon mikä yhteys kyseessä (admin käyttäjä vai lukulaite) */
 function ReturnConnectionType(conn){
     for(var i = 0; i < wsClients.length; i++){
         if(wsClients[i][1] == conn){
@@ -109,6 +114,7 @@ function ReturnConnectionType(conn){
     return "Reader";
 }
 
+/* Poistaa clientin viesti listalta */
 function RemoveClientFromArr(conn){
     var index = 0;
     for(var i = 0; i < wsClients.length; i++){

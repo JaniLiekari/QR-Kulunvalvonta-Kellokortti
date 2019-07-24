@@ -16,17 +16,20 @@ var PageConfig = require('./models/config');
 
 var statistic =  require('./statisticpage.js');
 
-async function GetPageSettings(){
+
+var AdminByName = require('./models/admin').getAccount;
+
+async function GetPageSettings(account, setting){
 	
 	var pageSettings;
-	var promise = await PageConfig.model.findOne({}).exec().then((conf) => {
-		if(conf)
-			pageSettings = conf['FirstPageName'];
-	});
+	var admin = await AdminByName(account);
+	console.log("ADMIN: " + admin);
+	pageSettings = admin[setting];
 
 	return pageSettings;
 
 }
+
 
 
 //Store person datas for csv and other arrays.
@@ -117,19 +120,9 @@ router.post('/edit', PrivilegesHandler.islogedIn, async function(req, res, error
 		out_time = new Date(out_time);
 		out_time.setHours(out_time.getHours() - (-out_time.getTimezoneOffset() / 60));
 	}
-	console.log(d);
+
 
 	var isWorkDay = req.body.isWorkDay;
-
-	console.log("IS WORK DAY: "+isWorkDay);
-
-	var file = req.session.username + '.txt';
-	var filepath = '/logs/';
-	/*Logger.WriteInFile(path.join(__dirname, filepath + file),'-----Kävijän kirjautumistietojen muokkaus------', req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Kohde: ' +f_name + " " + l_name, req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Sisään: ' + ((in_time != "") ? in_time : "Tyhjä"), req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'Ulos: ' + ((out_time != "") ? out_time : "Tyhjä"), req.session.username);
-	Logger.WriteInFile(path.join(__dirname, filepath + file),'---------Muokkaus loppu---------' + '\r\n', req.session.username);*/
 
 
 	try{
@@ -182,42 +175,9 @@ router.post('/edit', PrivilegesHandler.islogedIn, async function(req, res, error
 });
 
 
-/*router.get('/fix', function(req,res,error){
-	console.log("fixing");
-	Client.find({}, function(err, clients){
 
-		for(var i = 0; i < clients.length; i++){
-			var client = clients[i];
-
-			if(client['loggins'].length > 0 ){
-
-				var j = 0;
-				while(j < client['loggins'].length){
-
-					var login = client['loggins'][j]['date'];
-
-					if(login.getFullYear() >= 2019 && login.getMonth() >= 1  && login.getDate() >= 19){
-						client['loggins'].splice(j,1);
-						console.log("remove date: " + login);
-					}else{
-						j++;
-					}
-
-
-				}
-
-			}
-
-			client.save(function(err){
-
-			})
-
-		}
-
-	});
-
-});*/
-
+/* Alla olevat similarity JA editDistance on tekstin samallaisuusta vertailevia funktioita  */
+/* https://en.wikipedia.org/wiki/Levenshtein_distance */
 
 function similarity(s1, s2) {
   var longer = s1;
@@ -260,12 +220,18 @@ function editDistance(s1, s2) {
   return costs[s2.length];
 }
 
+/***************************************************************************************/
+/***************************************************************************************/
+
+
+
 //rendering client modifying page
 router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error){
 	var f_name = req.param('firstname');
 	var l_name = req.param('lastname');
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
-
+	var CONFIG = await PageConfig.return();
+	var SHOWLOG = await GetPageSettings(req.session.username, 'show_log') == true ? true : false;
 	if(f_name == "" || f_name == undefined || l_name == "" || l_name == undefined){
 
 		if(f_name != "" && f_name != undefined){
@@ -295,9 +261,19 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 					});
 
 					
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: names, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins,wsSecret: req.session.websocketSecret,});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: names, shifts: null, 
+										IP:Config.ip, PORT: Config.port, pageSettings: null, 
+										plugins: require('./admin.js').plugins,wsSecret: req.session.websocketSecret
+									});
 				}else{
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: null, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: null, shifts: null, 
+										IP:Config.ip, PORT: Config.port, pageSettings: null, 
+										plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+									});
 				}
 			});
 
@@ -329,9 +305,19 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 					});
 
 					
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: names, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+						         		QRLOG: SHOWLOG, page: "modify-client", data: null, 
+						         		privileges: privileges, names: names, shifts: null, 
+						         		IP:Config.ip, PORT: Config.port, pageSettings: null, 
+						         		plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+						         	});
 				}else{
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: null, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: null, shifts: null, 
+										IP:Config.ip, PORT: Config.port, pageSettings: null, 
+										plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+									});
 				}
 			});
 
@@ -339,7 +325,7 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 			Client.find({}, async function(err, client){
 				if(client){
 
-					var pageSettings = await GetPageSettings();
+					var pageSettings = await GetPageSettings(req.session.username, 'FirstPageName');
 
 					console.log("Tämä");
 					console.log(pageSettings);
@@ -363,9 +349,19 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 						names.push(hold);
 					}
 
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: names, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: pageSettings, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: names, shifts: null, 
+										IP:Config.ip, PORT: Config.port, pageSettings: pageSettings, 
+										plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+									});
 				}else{
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: null, shifts: null, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: null, shifts: null, 
+										IP:Config.ip, PORT: Config.port, pageSettings: null, 
+										plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+									});
 				}
 			});
 		}
@@ -389,7 +385,12 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 				if(err){
 					console.log(err);
 				}else if(!client){
-					res.render("index", {action: "Admin", user: req.session.username, page: "modify-client", data: null, privileges: privileges, names: null, shifts: shifts, IP:Config.ip, PORT: Config.port, pageSettings: null, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+					res.render("index", {action: "Admin", user: req.session.username, 
+										QRLOG: SHOWLOG, page: "modify-client", data: null, 
+										privileges: privileges, names: null, shifts: shifts, 
+										IP:Config.ip, PORT: Config.port, pageSettings: null, 
+										plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret
+									});
 				}else{
 					var vast = (client['vastuu'] != null) ? client['vastuu'] : "Ei lisätty";
 					var data = [];
@@ -539,6 +540,9 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 										}
 
 										dayData.push(client['loggins'][j]['workDay']);
+										dayData.push(c_date.getDay());
+										dayData.push(client['createDate']);
+										dayData.push(client['workDays']);
 			  							personData.push(dayData);
 			  							console.log(dayData);
 
@@ -650,14 +654,15 @@ router.get('/info', PrivilegesHandler.islogedIn, async function(req, res, error)
 					data['average_Week'] = tempWeek;
 
 					var adminList = await GetAdmins();
+					var CREATEDATE = client['createDate'];
 					res.render("index", {action: "Admin", user: req.session.username,
 										 page: "modify-client", data: data,
 										 privileges: privileges, names: null, 
 										 shifts: shifts, IP:Config.ip, 
 										 PORT: Config.port, workDays: client['workDays'], 
-										 vastuu: vast, admins: adminList, 
-										 pageSettings: null, plugins: require('./admin.js').plugins, 
-										 wsSecret: req.session.websocketSecret, absence: absence});
+										 vastuu: vast, admins: adminList, CREATEDATE: CREATEDATE,
+										 pageSettings: null, plugins: require('./admin.js').plugins,  
+										 wsSecret: req.session.websocketSecret, absence: absence, QRLOG: SHOWLOG});
 				}
 			});
 		}catch(error){
@@ -705,12 +710,16 @@ router.post('/mod', PrivilegesHandler.islogedIn, async function(req,res,error){
 	var l = req.param('lname');
 	var shift = req.param('shift');
 	var vastuu = req.param('vastuu');
-
+	var CD = req.param('createDate');
 	var workDays = JSON.parse(req.param('workDays'));
 
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
 	
 	if(privileges[3] != true){
+		res.send('400');
+		return;
+	}
+	if(CD == null || CD == undefined || CD == ""){
 		res.send('400');
 		return;
 	}
@@ -743,7 +752,7 @@ router.post('/mod', PrivilegesHandler.islogedIn, async function(req,res,error){
 		}
 
 		client['workDays'] = workDays;
-
+		client['createDate'] = new Date(CD);
 		client.save(function(err){
 			if(err){
 				res.send('400');

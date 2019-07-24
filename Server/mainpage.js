@@ -12,18 +12,19 @@ var AddDateInfo = require('./clientpage.js').AddDateInfo;
 
 var Client = require('./models/client').client;
 var GetAdmins = require('./models/admin').getNameList;
+var AdminByName = require('./models/admin').getAccount;
 var Login = require('./models/client').login;
 var Shift = require('./models/shifts').shift;
 var ShiftHandler = require('./models/shifts');
 var PageConfig = require('./models/config');
 
-async function GetPageSettings(){
+
+async function GetPageSettings(account, setting){
 	
 	var pageSettings;
-	var promise = await PageConfig.model.findOne({}).exec().then((conf) => {
-		if(conf)
-			pageSettings = conf['FirstPageName'];
-	});
+	var admin = await AdminByName(account);
+	console.log("ADMIN: " + admin);
+	pageSettings = admin[setting];
 
 	return pageSettings;
 
@@ -43,8 +44,12 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 	startDay = Extented.setDateHMS(startDay, 0,0,1);
 	//AIKA JOLLE TAULUKON LUOMINEN LOPETETAAN
 	endDay = Extented.setDateHMS(endDay, 23,59,59);
-	var pageSettings = await GetPageSettings();
+	console.log(req.session.username);
+	var pageSettings = await GetPageSettings(req.session.username, 'FirstPageName');
 
+
+	var CONFIG = await PageConfig.return(); console.log(CONFIG);
+	var SHOWLOG = await GetPageSettings(req.session.username, 'show_log') == true ? true : false;
 
 	var searchd = [];
 	searchd.push(startDay);
@@ -55,7 +60,6 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 		searchd.push(rs);
 	}
 
-	console.log(vast);
 
 	if(vast == null){
 		searchd.push("full_list");
@@ -73,7 +77,11 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 
 				Shift.find({}, function(err, s){
 						if(shifts == null){
-							res.render("index", {action: "Admin", user: req.session.username, page: "main", IP:Config.ip, PORT: Config.port, PAGESETTINGS: pageSettings, SEARCHD: searchd, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+							res.render("index", {action: "Admin", user: req.session.username, 
+												page: "main", IP:Config.ip, PORT: Config.port, 
+												PAGESETTINGS: pageSettings, SEARCHD: searchd, 
+												plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret,
+												QRLOG: SHOWLOG});
 
 						}
 			 			try{
@@ -86,7 +94,12 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 			 					temp.push(t);
 			 				}
 
-			 				res.render("index", {action: "Admin", user: req.session.username, page: "main", shifts: temp, IP:Config.ip, PORT: Config.port, PAGESETTINGS: pageSettings, SEARCHD: searchd, vastuu: adminList, plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+			 				res.render("index", {action: "Admin", user: req.session.username, 
+			 									page: "main", shifts: temp, IP:Config.ip, 
+			 									PORT: Config.port, PAGESETTINGS: pageSettings, 
+			 									SEARCHD: searchd, vastuu: adminList, 
+			 									plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret,
+			 									QRLOG: SHOWLOG});
 			 			}catch(err){
 			 				console.log("catch " + err);
 			 			}
@@ -222,6 +235,7 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 				  						dayData.push(clients[i]['loggins'][j]['workDay']);
 				  						dayData.push(clients[i]['workDays']);
 				  						dayData.push(c_date.getDay());
+				  						dayData.push(clients[i]['createDate']);
 				  						personData.push(dayData);
 
 				  					}
@@ -264,7 +278,12 @@ async function getTable(startDay, endDay, req, res, privileges, rs, vast){
 				 					t.push(s[i]['minutes']);
 				 					temp.push(t);
 				 				}
-				 				res.render("index", {action: "Admin", user: req.session.username, page: "main", data: data, privileges: privileges, shifts: temp,IP:Config.ip, PORT: Config.port, PAGESETTINGS: pageSettings, SEARCHD: searchd, vastuu: adminList,  plugins: require('./admin.js').plugins, wsSecret: req.session.websocketSecret});
+				 				res.render("index", {action: "Admin", user: req.session.username, 
+				 									page: "main", data: data, privileges: privileges, 
+				 									shifts: temp,IP:Config.ip, PORT: Config.port, 
+				 									PAGESETTINGS: pageSettings, SEARCHD: searchd, 
+				 									vastuu: adminList,  plugins: require('./admin.js').plugins, 
+				 									wsSecret: req.session.websocketSecret, QRLOG: SHOWLOG});
 				 			}catch(err){
 				 				console.log("catch " + err);
 				 			}
@@ -288,34 +307,40 @@ router.get('/', PrivilegesHandler.islogedIn, async function (req, res) {
 
 	var privileges = await PrivilegesHandler.GetPrivileges(req.session.username);
 
-	var request = "table";
 	var startDay = req.param("startDay");
-	if(startDay === null || startDay === undefined ||startDay === ""){
-		startDay = Extented.getMonday(new Date());
-	}else{
-		startDay = new Date(startDay);
-	}
 	var endDay = req.param('endDay');
-	if(endDay === null || endDay === undefined || endDay === ""){
-		endDay = Extented.getMonday(new Date());
-		endDay = new Date(endDay.setDate(endDay.getDate() + 4));
-	}else{
-		endDay = new Date(endDay);
-	}
 	var shift = req.param('shift');
-	if(shift == null || shift == "" ||shift == undefined || shift == "full_list"){
-		shift = null;
-	}
 	var vastuu = req.param('vastuu');
-	if(vastuu == null || vastuu == "" || vastuu == undefined || vastuu == "full_list"){
-		vastuu = null;
-	}
 
-	var _data;
+	/* ALLA TARKASTETAAN ETTÄ KAIKKI TARVITTAVA TIETO ON KÄYTÖSSÄ */
 
-	if(request === "table"){
-		getTable(startDay, endDay, req, res, privileges, shift, vastuu); 
-	}
+			if(startDay === null || startDay === undefined ||startDay === ""){
+				startDay = Extented.getMonday(new Date());
+			}
+			else{
+				startDay = new Date(startDay);
+			}
+
+			if(endDay === null || endDay === undefined || endDay === ""){
+				endDay = Extented.getMonday(new Date());
+				endDay = new Date(endDay.setDate(endDay.getDate() + 4));
+			}
+			else{
+				endDay = new Date(endDay);
+			}
+
+			if(shift == null || shift == "" ||shift == undefined || shift == "full_list"){
+				shift = null;
+			}
+
+			if(vastuu == null || vastuu == "" || vastuu == undefined || vastuu == "full_list"){
+				vastuu = null;
+			}
+
+	/* ------------------------------------------------------------ */
+
+	getTable(startDay, endDay, req, res, privileges, shift, vastuu);  /* Renderöinti tässä funktiossa */
+
 });
 
 

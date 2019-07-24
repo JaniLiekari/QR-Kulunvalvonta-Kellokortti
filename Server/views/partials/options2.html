@@ -13,6 +13,19 @@
 
 	}
 
+	.line{
+		display: block;
+		position: relative;
+		left: 50%;
+		transform: translate(-50%, 0);
+		width: 50%;
+		height: 2px;
+		background-color: rgb(180,180,180);
+		margin-top: 35px;
+		border-radius: 5px;
+		box-shadow: 0 1px 3px 1px rgb(50,50,50);
+	}
+
 	.leftside:before{
 		content: "";
 		width: 100%;
@@ -291,24 +304,66 @@ input:checked + .slider:before {
 			<p id="004" onclick="showHide('ACCOUNT_MANAGEMENT', this, '004');">Käyttäjien Hallinta</p>
 			<p id="006" onclick="showHide('Plugins', this, '006');">Plug & Play</p>
 			<p id="005" onclick="showHide('documents', this, '005');">Dokumentit</p>
+			<% var hookUp = HookPlugin(plugins, "Options", "SideBar"); %>
+			<% for(var i = 0; i < hookUp.length; i++){%>
+				<%- include(hookUp[i])%>
+			<%}%>	
 		</div>
 
 	</div>
 
-	<div style="width: 85%; height: 100%; display: inline-block; z-index: 666;">
+	<div style="width: 85%; height: 100%; display: inline-block; z-index: 666; overflow-y: auto;">
 		
 
-		<div id="hid_allowRegister" class="checkbox" style="font-size: 25px; text-align: center;" class=>
+		<div id="hid_allowRegister" style="font-size: 25px; text-align: center;" class=>
 			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
 				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Rekisteröinti</p>
 				<p style="margin-bottom: 2px"><b>-Salli rekisteröinti:</b> Rekisteröinnin ollessa sallittu kirjautumis-sivulla näkyy "Rekisteröi" nappi.</p> 
 				<p style="margin-bottom: 35px"><b>-Kytkin:</b> Kytkimen ollessa vihreä rekisteröinti on sallittu. Harmaana rekisteröinti on poissa käytössä.</p> 
 			</div>
 
+
 			<label class="switch">
 				<input id="checkBox" type="checkbox" onchange="sendData();" <% if(reg === true) { %> Checked <% } %> >
 				<span class="slider round"></span>
 			</label>
+
+			<div class="line"></div>
+
+			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Näytä ilmoitukset lukulaitteesta.</p>
+				<p style="margin-bottom: 35px"><b>-Kytkin:</b> Kytkimen ollessa vihreä saa kirjautunut hallitsija virheilmoitukset näytölleen lukulaitteesta reaaliaikaisesti.</p> 
+			</div>
+
+
+			<label class="switch">
+				<input id="qr-log-switch" type="checkbox" onchange="sendDataQR();" <% if(QRLOG === true) {  %> Checked <% } %> >
+				<span class="slider round"></span>
+			</label>
+
+
+			<div class="line"></div>
+
+			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
+				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Automaattinen puhdistus.</p>
+				<p style="margin-bottom: 2px"><b>!HUOM:</b> Automaattinen puhdistus ajetaan joka yö (kl 00:00) ja uudelleen käynnistymisen yhteydessä!.</p> 
+				<p style="margin-bottom: 2px"><b>!HUOM:</b> MUOKKAA AIKAA ENSIN! NÄIN VARMISTAT ETTEI VÄÄRÄÄ TIETOA POISTU!.</p> 
+				<p style="margin-bottom: 2px"><b>-Ajalta:</b> Kuinka monta kuukautta vanha data poistetaan tietokannasta.</p> 
+				<p style="margin-bottom: 35px"><b>-Kytkin:</b> Valitse käytetäänkö automaattista tietokannan puhdistusta.</p> 
+			</div>
+
+
+			
+			<label style="display: block;">
+				<p style="display: inline-block;">Ajalta: </p>
+				<input id="autocleanTime" onchange="sendAutoClean();" type="number" value="1" style="display: inline-block; width: 80px; border-radius: 5px; text-align: center;">
+				<p  style="display: inline-block;"> kk</p>
+			</label>
+			<label class="switch">
+				<input id="autoclean" type="checkbox" onchange="sendAutoClean();" <% if(AUTOCLEAN === true) {  %> Checked <% } %> >
+				<span class="slider round"></span>
+			</label>
+			<div class="line"></div>
 
 			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
 				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Backup</p>
@@ -326,6 +381,8 @@ input:checked + .slider:before {
 
 			</div>
 
+			<div class="line"></div>
+
 
 			<div style="width: 100%; padding-top: 20px; text-align: center; font-size: 1rem">
 				<p style="margin-bottom: 5px; font-weight: 700; font-size: 30px; color: #39db59; text-shadow: 0 0 5px black;">Reset</p>
@@ -339,6 +396,8 @@ input:checked + .slider:before {
 					<button class="backup-b" style="background-color: #a8153f;" onclick="ResetServer();"><p>Resetoi</p></button>
 				</div>
 			</div>
+
+
 
 
 	</div>	
@@ -445,16 +504,23 @@ input:checked + .slider:before {
 			<div>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/helppo_asennus.pdf" download>Helppo asennus</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/Kayttoohjeet.pdf" download>Ohjeet ohjelman käyttöön</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/ETUSIVUN_TAULUKON_VARIT.pdf" download>Etusivun taulukon värit</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/flowchart.pdf" download>Flowchart</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/DB_KAYTTAJA_PAIVITYS.pdf" download>DB käyttäjä modelien päivitys</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/PLUGINS.pdf" download>Pluginsien teko ja käyttö</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/QRCODE_OMI.pdf" download>QR-Koodi lukijan ominaisuudet</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/polut_modelit_ja_muuta.pdf" download>Polut, Modelit yms.</a>
+				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/DataLoggaus.pdf" download>Lokien luominen / ylläpitäminen</a>
 				<a class="downloadlink" href="http://<%=IP%>:<%=PORT%>/file/documents/Troubles.pdf" download>Ongelmat</a>
+
 			</div>
 
 		</div>
 
-
+		<% var hookUp = HookPlugin(plugins, "Options", "Page"); %>
+		<% for(var i = 0; i < hookUp.length; i++){%>
+			<%- include(hookUp[i])%>
+		<%}%>	
 
 		<div id="ACCOUNT_MANAGEMENT" class="hidden" style="width: 100%; margin-top: 10px; padding-top: 10px; padding-bottom: 30px; ">
 			<div style="position: relative; text-align: center">
@@ -601,6 +667,33 @@ input:checked + .slider:before {
 
 <script type="text/javascript">
 
+function sendAutoClean(){
+	var use = document.getElementById('autoclean').checked == true ? true : false;
+	var time = document.getElementById('autocleanTime').value;
+
+	if(use == true && time <= 0){
+		alert('Virhe *Aika <= 0*');
+		return;
+	}else{
+
+		var request =  new XMLHttpRequest();
+		var url = 'http://<%=IP%>:<%=PORT%>/admin/options/autoclean';
+		var params="use="+use + "&time="+time;
+		request.open("POST", url,true);
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.onreadystatechange = function() {
+		    if(request.readyState == 4 && request.status == 200) {
+		    	alert("settings saved");
+		    }
+		}
+
+		request.send(params);
+
+	}
+
+}
+
 function Reset(){
 	var request =  new XMLHttpRequest();
 	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/reset';
@@ -665,8 +758,22 @@ function FixWrapper(){
 
 }
 
-document.onload = FixWrapper();
 
+document.onload = FinalLoad();
+
+function FinalLoad(){
+
+	if(OnLoadFunctions != null){
+		console.log(OnLoadFunctions);
+		if(OnLoadFunctions.length >= 0){
+			for(var i = 0; i < OnLoadFunctions.length; i++){
+				OnLoadFunctions[i]();
+			}
+		}
+	}
+
+	FixWrapper();
+};
 
 function OpenFileDialog(){
 
@@ -993,6 +1100,26 @@ function sendData(){
 	console.log(checkBox);
 	var request =  new XMLHttpRequest();
 	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/register';
+	var params="allowed="+checkBox;
+	request.open("POST", url,true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+	request.onreadystatechange = function() {
+	    if(request.readyState == 4 && request.status == 200) {
+	    	alert("settings saved");
+	    }
+	}
+
+	request.send(params);
+
+}
+
+function sendDataQR(){
+
+	var checkBox = document.getElementById("qr-log-switch").checked == true ? true : false;
+	console.log(checkBox);
+	var request =  new XMLHttpRequest();
+	var url = 'http://<%=IP%>:<%=PORT%>/admin/options/qr-log';
 	var params="allowed="+checkBox;
 	request.open("POST", url,true);
 	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
