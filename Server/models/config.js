@@ -4,6 +4,9 @@ mongoose.Promise = global.Promise
 
 var configSchema = mongoose.Schema({
 	allowRegister: Boolean,
+	show_log: Boolean,
+	useClean: Boolean,
+	cleanTime: Number,
 	LastClean: Date,
 	FirstPageName: String
 });

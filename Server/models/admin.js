@@ -12,7 +12,9 @@ var Account = new Schema({
     mod_shifts: Boolean,
     mod_accounts: Boolean,
     remove_accounts: Boolean,
-    WebSocketKey: String
+    WebSocketKey: String,
+    FirstPageName: String,
+    show_log: Boolean
 });
 
 Account.pre('save', function(next){
@@ -41,6 +43,21 @@ module.exports.getNameList = async function(){
     return accounts;
 
 }
+
+module.exports.getAccount = async function(name){
+
+    var result;
+
+    await model.findOne({username: name}).exec().then((account) => {
+        if(account){
+            result = account;
+        }
+    });
+
+    return result;
+
+}
+
 
 module.exports.saveWSKey = async function(name, key){
     await model.findOne({username: name}).exec().then((account) => {
