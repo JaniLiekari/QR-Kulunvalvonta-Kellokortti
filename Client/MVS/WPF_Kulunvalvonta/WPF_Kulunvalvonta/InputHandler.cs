@@ -7,6 +7,10 @@ using System.Threading;
 using System.Windows.Input;
 namespace WPF_Kulunvalvonta
 {
+    /* ******************************************************************
+     * Hoitaa syötteen hallinnoinnin. 
+     * Tähän voisi vielä ottaa käyttöön aika katkaisun. Itsellä meni jossain kohtaa vain threadit sekaisin niin päätin ottaa sen pois.
+     * ******************************************************************/
     class InputHandler
     {
         public delegate void Callback(string message);
@@ -14,14 +18,17 @@ namespace WPF_Kulunvalvonta
         bool waitingInput = false;
         public static bool ignoreInput = false;
         List<char> array;
-        Thread currentDelay;
+        Thread currentDelay; /* EI KÄYTÄSSÄ */
 
+        /* Ajetaan kun uusi class luodaan */
         public InputHandler(Callback cb)
         {
             array = new List<char>();
             waitingInput = true;
             callback = cb;
         }
+
+        /* Keskeyttää syötteen. Tätä käytettään myös resetoinnissa. */
         public void Cancel()
         {
             Console.WriteLine("Cancel: " + new string(array.ToArray()));
@@ -29,6 +36,9 @@ namespace WPF_Kulunvalvonta
             waitingInput = true;
             ignoreInput = false;
         }
+
+
+        /* Muuttaa syötteen char:ksi */
         char KeyToChar(Key key)
         {
 
@@ -118,46 +128,58 @@ namespace WPF_Kulunvalvonta
                 default: return '?';
             }
         }
+        /* ************************* */
+
+        /* Kirjaa syötettä talteen */
         public void Log(object sender, KeyEventArgs e)
         {
 
-            char key = KeyToChar(e.Key);
+            char key = KeyToChar(e.Key);  /* Char muodossa syöte --> Key.A ---> 'A' */
             if (!ignoreInput)
             {
                 if (key == '?')
                 {
-
-                }else if(key == '%')
+                    /* ************************************************
+                     * Tämä vain ignorataan kokonaan, tähän voi laittaa jonkun näköistä debuggasta,
+                     * koska tätä ei pitäisi koskaan tulla 
+                     * ***********************************************/
+                }
+                else if(key == '%') // SHIFT + 5
                 {
                     UpdateForm.UpdateCancleInput(false);
                     Cancel();
-                }else if(key == '#')
-                {
+                }
 
+                /* Näyttää lokin näytöllä */
+                else if(key == '#') // SHIFT + 3
+                {
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                     path = System.IO.Path.Combine(path, "errorLog.txt");
                     FileWriter.ReadFile(path, UpdateForm.ShowErrorLog);
-
-
                     Cancel();
                 }
+
+                /* Hyväksytty syöte qr koodista */
                 else
                 {
+                    /* Jos tämä on ensimmäinen kerta kun odotetaan syötettä ja syötettä vastaan otetaan */
                     if (waitingInput == true)
                     {
                         UpdateForm.UpdateCancleInput(true);
-                        //currentDelay = Threading.InputTimer(5, Cancel);
                         waitingInput = false;
                     }
+                    /* '!' Toimii syötteen lopetusmerkkinä. Syöte kokonaisuudessaan lähetetään serverille */
                     if (key == '!')
                     {
                         array.Add(key);
                         UpdateForm.UpdateCancleInput(false);
                         ignoreInput = true;
-                        string qr = new string(array.ToArray());
-                        callback.Invoke(qr);
+                        string qr = new string(array.ToArray()); 
+                        callback.Invoke(qr);  /* MessageHandler.SendMessage("syöte") */
                         //Threading.CancelThread(currentDelay);
                     }
+
+                    /* Jos jokin muu hyväksytty syötemerkki niin lisätään syöte listaan */
                     else if (key != ' ' && key != '\n' && key != '\r' && key != '\n')
                     {
                         Threading.startTime = DateTime.Now;

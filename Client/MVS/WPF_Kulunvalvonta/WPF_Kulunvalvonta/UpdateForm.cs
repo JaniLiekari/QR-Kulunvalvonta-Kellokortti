@@ -8,11 +8,21 @@ namespace WPF_Kulunvalvonta
     static class UpdateForm
     {
 
+        /* **********************************************************************************************************************
+         * Erillaisia UI funkioita.
+         * Parhaiten perille pääsee kun avaa MainWindow.xaml tiedoston niin että näytöllä näkyy UI desing:ri ja xml tiedosto.
+         * Tiedostosta voi sitten etsiä kohtia joita tässä luokassa esiintyy.
+         * 
+         * Esim:
+         * UpdateTime(float time) funktiossa on kohta:
+         *          MainWindow.instantiate.Time.Visibility
+         * Tämän löytää xml tiedostosta kohdasta jossa propertynä xName on "Time".
+         * Visibility on taas kohdan property Visibility.
+         * **********************************************************************************************************************/
+
         public delegate void Callback();
         public delegate void Callback2(string message);
-
         public static bool ShowErrorLogBool = false;
-
         public static void UpdateTime(float time)
         {
 
@@ -69,8 +79,6 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Threading.Output_ss(UpdateError), obj);
             }
         }
-
-
         public static void HideAndActive()
         {
 
@@ -89,7 +97,6 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Threading.Callback(HideAndActive), obj);
             }
         }
-
         public static void UpdateErrorCallback(string message, bool autohide = true)
         {
             if (MainWindow.instantiate.Dispatcher.CheckAccess())
@@ -109,8 +116,6 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Threading.Output_ss(UpdateErrorCallback), obj);
             }
         }
-
-
         public static void ClearErrorLog()
         {
             if (MainWindow.instantiate.Dispatcher.CheckAccess())
@@ -139,7 +144,6 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Callback(ClearErrorLog), obj);
             }
         }
-
         public static void UpdateErrorLog(string message)
         {
             if (MainWindow.instantiate.Dispatcher.CheckAccess())
@@ -168,7 +172,6 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Callback2(UpdateErrorLog), obj);
             }
         }
-
         public static void ShowErrorLog()
         {
 
@@ -201,7 +204,6 @@ namespace WPF_Kulunvalvonta
             }
           
         }
-
         public static void OpenConfig()
         {
             if (MainWindow.instantiate.Dispatcher.CheckAccess())

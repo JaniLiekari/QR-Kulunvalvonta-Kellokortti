@@ -18,7 +18,8 @@ namespace WPF_Kulunvalvonta
 
         public static bool IS_OK = true;
 
-
+        /* Tarkistaa onko config tiedosto luettu onnistuneesti */
+        /* Jos on niin käynnistää Websocketin ja tarkistaa yhteyden serveriin */
         public static void FileLoaded()
         {
             string s = FileWriter.Text;
@@ -37,11 +38,12 @@ namespace WPF_Kulunvalvonta
                 ip = data["IP"].ToString();
                 port = data["PORT"].ToString();
 
-                NetTest.Test();
-                MainWindow.instantiate.StartWebSocket();
+                NetTest.Test(); /* Tarkistaa yhteyden serveriin */
+                MainWindow.instantiate.StartWebSocket();    /* Aloittaa websocket yhteyden */
 
             }
         }
+        /* Apu funktio config tiedoston lukemiseksi */
         public static void Load()
         {
             path = Directory.GetCurrentDirectory() + "/configure.syke";

@@ -2,11 +2,15 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Runtime.InteropServices;
-using WebSocketSharp;
+/* 3party from nugget */
+using WebSocketSharp; 
 
 
 namespace WPF_Kulunvalvonta
 {
+
+    /* NÄMÄ OVAT NÄYTÖN SULKEMISEN ESTÄMISTÄ VARTEN */
+
     [FlagsAttribute]
     public enum EXECUTION_STATE : uint
     {
@@ -21,49 +25,57 @@ namespace WPF_Kulunvalvonta
         public static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
     }
 
+    /************************************************/
+
+
     public partial class MainWindow : Window
     {
-        public static MainWindow instantiate;
-        public MessageHandler messageHandler;
-        InputHandler handler;
-        WebSocket ws = null;
-        System.Threading.Thread WEBSOCKETHANDLER = null;
-        bool WS_Connecting = false;
+       
+        public static MainWindow instantiate;                       // Tämä luokka toimii singleton rakennuspalasena muille luokille.
+        public MessageHandler messageHandler;                       // Hallinnoi syötteen lähettämisen serverille ja serverin vastausten hoitamisen.
+        InputHandler handler;                                       // Hallinnoi syötteen kirjaamisen.
+        WebSocket ws = null;                                        // Itse websocketti.
+        System.Threading.Thread WEBSOCKETHANDLER = null;            // Websocket thread.
+        bool WS_Connecting = false;                                 // Flagi onko ws yhteys muodostettu.
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();                                  // WPF (windows ??? forms) default funktio. 
             instantiate = this;
-            PreventSleep();
-            messageHandler = new MessageHandler();
-            Information.Load();
+            PreventSleep();                                         // Estää näytön sammumisen.
+            messageHandler = new MessageHandler();                 
+            Information.Load();                                     // Ladataan config tiedot (IP , PORT)
         }
 
         public void StartWebSocket()
         {
 
             WS_Connecting = true;
-
-            if (this.Dispatcher.CheckAccess())
+                                                     // Dispatcheria tulee näkymään paljon koodissa.
+            if (this.Dispatcher.CheckAccess())       // Dispatcher.CheckAccess tarkistaa että komentoa ajetaanko UI threadissa. Jos ajetaan palauttaa se TRUE
             {
                
                 string uri = "ws://" + Information.ip + ":3330";
+                Console.WriteLine(Information.ip);
                 string[] protocol = new string[]
                 {
-                "echo-protocol"
+                    "echo-protocol"
                 };
 
                 ws = new WebSocket(url: uri, protocols: protocol);
 
-                ws.OnOpen += (sender2, e2) => OpenedWS();
+                /* Eventit websocketille */
+                ws.OnOpen += (sender2, e2) => OpenedWS();       
                 ws.OnError += (sender3, e3) => ErrorWS();
                 ws.OnClose += (sender4, e4) => CloseWS();
+                /*************************/
+
                 ws.Origin = "http://127.0.0.1:3330";
                 ws.Connect();
                
 
                 if (WEBSOCKETHANDLER == null)
                 {
-
+                    /* Threadi joka pitää huolen että ws yhteys pysyy muodostettuna / hoitaa uudelleen yhdistämiset */
                     System.Threading.ThreadStart start = new System.Threading.ThreadStart(WEBSOCKET_AUTORECONNECT);
                     WEBSOCKETHANDLER = new System.Threading.Thread(start);
                     WEBSOCKETHANDLER.IsBackground = true;
@@ -74,71 +86,91 @@ namespace WPF_Kulunvalvonta
             }
             else
             {
-               
+                /* Jos kyseessä ei ollut UI threadi, ladataan funktio uudestaan UI threadissa */
                 MainWindow.instantiate.Dispatcher.Invoke(StartWebSocket);
 
             }
 
         }
 
-
+        /* En saanut toimimaan websocketsharpin automaattista uudelleen yhdistämistä järkevästi siksi tämä threadi */
         public void WEBSOCKET_AUTORECONNECT()
         {
+
+            /* 
+             * 
+             * Käytin tosi simppeliä lyhyttä nukkumista ja +1 laskemista,
+             * koska jostain syystä Thread.Sleep jäädytti myös UI threadin vaikka tämä funktio
+             * pyörii omassa threadissaan.
+             * 
+             */
+
+            int interval = 0;
             while (true)
             {
-                
-                if (!ws.IsAlive && !WS_Connecting)
+                if (interval >= 10000)
                 {
-                    StartWebSocket();
+                    interval = 0;
+
+                    if (!ws.IsAlive && !WS_Connecting)
+                    {
+                        StartWebSocket();
+                    }
+
                 }
 
 
-                System.Threading.Thread.Sleep(10000);
+                System.Threading.Thread.Sleep(10);
+                interval += 1;
 
             }
         }
 
-
+        /* Websocket Eventit */
         void OpenedWS()
         {
             WS_Connecting = false;
+            Console.WriteLine("OPENWS");
             ws.Send("Reader");
         }
 
         void ErrorWS()
         {
+            Console.WriteLine("ERRORWS");
             WS_Connecting = false;
             
         }
 
         void CloseWS()
         {
+            Console.WriteLine("CLOSEWS");
             WS_Connecting = false;
         }
+        /********************/
 
        
-
+        /* Apu funktio config tietojen tallentamiseen */
         void SaveConf(object sender, RoutedEventArgs e)
         {
             string ip = InputIP.Text;
             string port = InputPORT.Text;
 
-            string json = "{\"IP\":\""+ip+"\",\"PORT\":\""+port+"\"}";
+            string json = "{\"IP\":\""+ip+"\",\"PORT\":\""+port+"\"}"; // Json string.
 
             Conf.Visibility = Visibility.Hidden;
 
             FileWriter.WriteConfig(json, Information.path);
             Information.Load();
 
-
-
         }
 
+        // Pyyhkii local loki tiedoston.
         void ClearLog(object sender, RoutedEventArgs e)
         {
             FileWriter.ClearLogFile();
         }
 
+        /* Aktivoi syötteen lukemisen */
         public void Active()
         {
             if (!Dispatcher.CheckAccess())
@@ -160,6 +192,9 @@ namespace WPF_Kulunvalvonta
                 this.KeyDown += handler.Log;
             }
         }
+
+
+        /* Uudelleen aktivoi syötteen lukemisen */
         public void ReActive()
         { 
             if (!Dispatcher.CheckAccess())
@@ -175,6 +210,8 @@ namespace WPF_Kulunvalvonta
             Center.Visibility = Visibility.Hidden;
             handler.Cancel();
         }
+
+        /* Estää näytön sammumisen */
         public void PreventSleep()
         {
             if (SleepUtil.SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS

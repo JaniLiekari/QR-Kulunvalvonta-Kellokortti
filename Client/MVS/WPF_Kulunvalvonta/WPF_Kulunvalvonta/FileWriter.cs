@@ -10,13 +10,16 @@ namespace WPF_Kulunvalvonta
     static class FileWriter
     {
 
-        static void HasFile(string path)
+        /* Varmistaa että tiedosto on olemassa. Jos ei ole, niin luo tiedoston */
+       static void HasFile(string path)
        {
             if (!File.Exists(path))
             {
                 File.Create(path);
             }
         }
+
+        /* Kirjoittaa virhelokiin viestin */ 
         public static void WriteInFile(string message)
         {
             string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -35,13 +38,16 @@ namespace WPF_Kulunvalvonta
             }
         }
 
+        /* Asettaa viestin eteen aikaleiman */
         public static string AddDateTime(string message)
         {
             return DateTime.Now + " - " + message;
         }
 
+        /* Väliaikainen holderi luetulle tekstille. */
         public static string Text;
 
+        /* Kirjoittaa dataa config tiedostoon */
         public static void WriteConfig(string data, string file)
         {         
             using (StreamWriter output = File.CreateText(file))
@@ -51,7 +57,7 @@ namespace WPF_Kulunvalvonta
             }
         }
 
-
+        /* Tyhjentää loki tiedoston / kirjoittaa loki tiedostoon "" (En varma onko täysin sama kuin tyhjä?) */
         public static void ClearLogFile()
         {
             UpdateForm.ClearErrorLog();
@@ -65,6 +71,7 @@ namespace WPF_Kulunvalvonta
             }
         }
 
+        /* Lukee tiedoston ja tallentaa datan ylempänä olevaan Text holderiin */
         public static async void ReadFile(string file, Threading.Callback cb)
         {
             try

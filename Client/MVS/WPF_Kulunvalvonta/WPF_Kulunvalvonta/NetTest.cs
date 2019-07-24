@@ -12,6 +12,8 @@ namespace WPF_Kulunvalvonta
     {
         public static float ErrorRetryTime = 10f;
 
+
+        /* Funktio tarkistaa yhteyden serveriin. */
         public static void Test()
         {
             Console.WriteLine("Start NetTest....");
@@ -39,6 +41,8 @@ namespace WPF_Kulunvalvonta
                 MainWindow.instantiate.Dispatcher.Invoke(new Threading.Callback(Test), obj);
             }
         }
+
+        /* Pingaus */
         static bool IsNetWorkOk()
         {
             Ping x = new Ping();

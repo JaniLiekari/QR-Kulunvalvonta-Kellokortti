@@ -8,6 +8,9 @@ namespace WPF_Kulunvalvonta
 {
     static class Threading
     {
+
+        /* Apu funktiota threadaamista varten */
+
         public delegate void Callback();
         public delegate void Output(float f);
         public delegate void Output_s(string s);
