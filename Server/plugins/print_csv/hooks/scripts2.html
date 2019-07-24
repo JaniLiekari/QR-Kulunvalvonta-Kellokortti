@@ -102,10 +102,12 @@ function SaveCSV(version){
 		indexY+=1;
 	}
 
+	var separator = version == "xxxx" ? ';' : ','; 
+   	var rowMark = version == "xxxx" ? '\r\n' : '*';
+
 	CSV.forEach(function(rowArray){
-   		var rowMark = version == "xxxx" ? ';' : ','; 
-	   	let row = rowArray.join(rowMark);
-	   	csvContent += row + "\r\n";
+	   	let row = rowArray.join(separator);
+	   	csvContent += row + rowMark;
 	}); 
 
 	var encodedUri = csvContent;

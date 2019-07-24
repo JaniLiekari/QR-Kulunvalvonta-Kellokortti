@@ -1,5 +1,5 @@
-<div class="dropdown" style="margin-left: 10px; display: inline-block; top: -5px;">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div class="dropdown" style="margin-left: 10px; display: inline-block; top: -27px; position: relative;">
+  <button style="position: absolute; left: 0; top:0;" onclick="scrollDownLoop();" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
     Lataa CSV
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -7,3 +7,14 @@
     <button class="dropdown-item" onclick="SaveCSV('xxxx')">Another</button> 						 	<!-- Default delimiter ';' -->
   </div>
 </div>
+
+<script>
+	function scrollDownLoop(){
+				console.log("Hello world");
+			setTimeout(DoScroll, 10);
+	}
+
+	function DoScroll(){
+			window.scrollTo(0,document.body.scrollHeight);
+	}
+</script>

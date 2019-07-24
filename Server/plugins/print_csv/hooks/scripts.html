@@ -20,14 +20,14 @@
 	function SaveCSV(version){
 
 		var CSV = [];
-		let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";
+		let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";  //SETTING UTF-8
 
 
-		var tbody = document.getElementsByTagName("tbody")[0];
-		var thead = document.getElementsByTagName("thead")[0];
+		var tbody = document.getElementsByTagName("tbody")[0]; 
+		var thead = document.getElementsByTagName("thead")[0]; //ENSIMMÄINEN RIVI
 
 		var thead_th = thead.getElementsByTagName("th");
-		var tr = tbody.getElementsByTagName("tr");
+		var tr = tbody.getElementsByTagName("tr"); // LISTA RIVEISTÄ ENSIMMÄISEN JÄLKEEN
 		var indexY = 1;
 		var temp = [];
 
@@ -39,7 +39,7 @@
 
 		for(var i = 1; i < thead_th.length; i++){
 			if(thead_th[i].getElementsByTagName("p")[0]){
-				temp.push(thead_th[i].getElementsByTagName("p")[0].innerHTML);
+				temp.push(thead_th[i].getElementsByTagName("p")[0].innerHTML); // VIIKON PÄIVÄ (MA TI KE TO PE)
 				temp.push("");
 				temp.push("");
 			}
@@ -51,7 +51,7 @@
 		temp.push("");
 		for(var i = 1; i < thead_th.length; i++){
 			if(thead_th[i].getElementsByTagName("p")[0]){
-				temp.push(thead_th[i].getElementsByTagName("p")[1].innerHTML);
+				temp.push(thead_th[i].getElementsByTagName("p")[1].innerHTML); // PÄIVÄMÄÄRÄ 14.03.1993
 
 				temp.push("");
 				temp.push("");
@@ -70,13 +70,13 @@
 			var temp2 = [];
 			var temp3 = [];
 			console.log(tr[i]);
-			temp.push(tr[i].getElementsByTagName("td")[0].getElementsByTagName("a")[0].getElementsByTagName("b")[0].innerHTML);
+			temp.push(tr[i].getElementsByTagName("td")[0].getElementsByTagName("a")[0].getElementsByTagName("b")[0].innerHTML); // HENKILÖN NIMI
 			temp.push("");
 			temp2.push("");
 			temp2.push("");
 			temp3.push("");
 			temp3.push("");
-			var td = tr[i].getElementsByTagName("td");
+			var td = tr[i].getElementsByTagName("td");  // KIRJAUTUMIS PÄIVÄT
 			for(var t = 1; t < td.length; t++){
 
 				var div = td[t].getElementsByTagName("div")[2].getElementsByTagName("div")[0];
@@ -131,10 +131,13 @@
 			indexY += 1;
 		}
 
+		var separator = version == "xxxx" ? ';' : ','; 
+   		var rowMark = version == "xxxx" ? '\r\n' : '*';
+
 		CSV.forEach(function(rowArray){
-			var rowMark = version == "xxxx" ? ';' : ','; 
-	   		let row = rowArray.join(rowMark);
-	   		csvContent += row + "\r\n";
+		
+	   		let row = rowArray.join(separator);
+	   		csvContent += row + rowMark;
 		}); 
 
 		var encodedUri = csvContent;
